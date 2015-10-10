@@ -11,9 +11,9 @@ October 9, 2015
 
 STILL TODO FOR QUALTRICS:
 - Integration of Risk
-- Integration of custom numbers of questions
 - JSDoc and in-line documentation
 - Refactoring DEEPTime.beginDEEP() first-run
 - Validation and error handling
 - Warm-up questions
 - Consider using lz-string to compress itemRisks and codedIndexers or consider lazy-loading them dynamically
+- Separate out DEEPTime and core stuff into another file and use Gulp to combine them when needed

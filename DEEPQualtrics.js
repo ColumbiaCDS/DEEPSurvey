@@ -6,11 +6,18 @@ Qualtrics.SurveyEngine.addOnload(function()
   // ============== DEEPTime ==============
   // ======================================
 
-  var DEEPTime = function(platform) {
-    this.questionCount = 12;
-    // TODO: Validate max
-    
-    this.platform = platform;
+  var DEEPTime = function(platform, questionCount) {
+    if (questionCount > 12) {
+      alert('This survey has encountered an error. Please contact the survey administrator with the following error message: "DEEP Time initialized with more than 12 questions; more than 12 questions is unsupported."');
+    } else {
+      this.questionCount = questionCount;
+
+      // Set the class that called this, a type of DEEPPlatform
+      // so DEEPTime can communicate with it
+      this.platform = platform;
+
+      console.log('DEEP - Initializing DEEP Time with ' + questionCount + ' questions');
+    }
   }
 
   DEEPTime.prototype.data = [];
@@ -234,13 +241,23 @@ Qualtrics.SurveyEngine.addOnload(function()
 
   DEEPQualtrics.prototype.setup = function() {
     // Save the DEEPID
-    this.DEEPID = this.getDEEPID;
+    this.DEEPID = this.getDEEPID();
     this.bootstrapUI();
 
-    // Initialize the first question, passing in this instance
-    // of DEEPQualtrics as an instance
-    this.DEEPCore = new DEEPTime(this);
-    this.DEEPCore.beginDEEP();
+    // Validate that the DEEP ID is correct
+    // If correctly validated, it will also set DEEPQuestionCount and DEEPType
+    if (this.validateDEEPID()) {
+      // Initialize the first question, passing in this instance
+      // of DEEPQualtrics as an instance
+      
+      if (this.DEEPType == "TIME") {
+        this.DEEPCore = new DEEPTime(this, this.DEEPQuestionCount);
+      } else if (this.DEEPType == "RISK") {
+        // TODO: Implement Risk
+        this.DEEPCore = new DEEPTime(this, this.DEEPQuestionCount);
+      }
+      this.DEEPCore.beginDEEP();
+    }
   }
 
   DEEPQualtrics.prototype.bootstrapUI = function() {
@@ -323,8 +340,7 @@ Qualtrics.SurveyEngine.addOnload(function()
    * @param  {string} choice0 HTML text for the first choice.
    * @param  {string} choice1 HTML text for the second choice.
    */
-  DEEPQualtrics.prototype.updateChoices = function(choice0, choice1)
-  {
+  DEEPQualtrics.prototype.updateChoices = function(choice0, choice1) {
     console.log(choice1);
     jQuery('#DEEP-choice-label-0').html(choice0);
     jQuery('#DEEP-choice-label-1').html(choice1); 
@@ -354,11 +370,38 @@ Qualtrics.SurveyEngine.addOnload(function()
     this.qualtricsEngine.clickNextButton();
   }
 
-  DEEPQualtrics.prototype.getDEEPID = function ()
-  {
+  DEEPQualtrics.prototype.getDEEPID = function () {
     // Find the DEEPID
     var qualtricsQuestionInfo = this.qualtricsEngine.getQuestionInfo();
     return qualtricsQuestionInfo.QuestionText;
+  }
+
+  DEEPQualtrics.prototype.validateDEEPID = function() {
+    // Validate that the DEEPID given is valid
+    // DEEPID *may* be in the format "DEEPTIME12"
+    // First validate that it begins with DEEP
+    if (this.DEEPID) {
+      // Next, run the regex to pull out the name of the DEEP variant and the number of questions
+      var validationRegex = /DEEP(TIME|RISK)([0-9]{1,2})/i;
+
+      // Now, match
+      var validationCheck = this.DEEPID.match(validationRegex);
+
+      // Check if it worked
+      if (validationCheck == null) {
+        alert('This survey has encountered an error. Please contact the survey administrator with the following error message: "DEEP was not initialized correctly. Please check the DEEP ID on your survey."');
+        return false;
+      } else {
+        // Correctly validated
+        // Store the type and questions
+        this.DEEPType = validationCheck[1].toUpperCase();
+        this.DEEPQuestionCount = validationCheck[2];
+        return true;
+      }
+    } else {
+      alert('This survey has encountered an error. Please contact the survey administrator with the following error message: "DEEP was not initialized correctly. Please check the DEEP ID on your survey."');
+      return false;
+    }
   }
 
   /**
