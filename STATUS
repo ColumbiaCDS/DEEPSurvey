@@ -2,3 +2,19 @@ October 9, 2015
 ===============
 
 - Started framework for Qualtrics DEEP
+- Built out UI for Qualtrics
+- Built out IDEEPTime and IDEEPQualtrics core functions
+- Added priors
+- Added randomization
+- Added most of the logic
+- Initial testing against current Qualtrics
+
+STILL TODO FOR QUALTRICS:
+- Integration of Risk
+- JSON export
+- Completion test
+- Integration of custom numbers of questions
+- JSDoc and in-line documentation
+- Refactoring DEEPTime.beginDEEP() first-run
+- Validation and error handling
+- Warm-up questions
