@@ -8,6 +8,8 @@ Qualtrics.SurveyEngine.addOnload(function()
 
   var DEEPTime = function(platform) {
     this.questionCount = 12;
+    // TODO: Validate max
+    
     this.platform = platform;
   }
 
@@ -128,23 +130,29 @@ Qualtrics.SurveyEngine.addOnload(function()
   }
 
   DEEPTime.prototype.nextQuestion = function() {
-    // Increment current step
-    this.currentStep++;
+    // First check if the current step is the last step
+    if (this.currentStep >= this.questionCount) {
+      // Question limit reached
+      this.finish();
+    } else {
+      // Increment current step
+      this.currentStep++;
 
-    // We need to use the codedIndexer to look up the value for choice 0 and choice 1
-    var choice0Index = this.decodeIndexer(this.priors.codedIndexers[this.currentStep].charCodeAt(this.path * 2));
-    var choice1Index = this.decodeIndexer(this.priors.codedIndexers[this.currentStep].charCodeAt(this.path * 2 + 1));
+      // We need to use the codedIndexer to look up the value for choice 0 and choice 1
+      var choice0Index = this.decodeIndexer(this.priors.codedIndexers[this.currentStep].charCodeAt(this.path * 2));
+      var choice1Index = this.decodeIndexer(this.priors.codedIndexers[this.currentStep].charCodeAt(this.path * 2 + 1));
 
-    // Get the choice at that index
-    this.currentChoice0 = this.getChoiceOption(0, choice0Index);
-    this.currentChoice1 = this.getChoiceOption(1, choice1Index);
+      // Get the choice at that index
+      this.currentChoice0 = this.getChoiceOption(0, choice0Index);
+      this.currentChoice1 = this.getChoiceOption(1, choice1Index);
 
-    // Get the choice text
-    var choice0Text = this.getChoiceText(this.currentChoice0);
-    var choice1Text = this.getChoiceText(this.currentChoice1);
+      // Get the choice text
+      var choice0Text = this.getChoiceText(this.currentChoice0);
+      var choice1Text = this.getChoiceText(this.currentChoice1);
 
-    // Tell the platform to update the choice text
-    this.platform.updateChoices(choice0Text, choice1Text);
+      // Tell the platform to update the choice text
+      this.platform.updateChoices(choice0Text, choice1Text);
+    }
   }
 
   DEEPTime.prototype.getChoiceOption = function(optionSet, choiceIndex) {
@@ -202,6 +210,11 @@ Qualtrics.SurveyEngine.addOnload(function()
     return "Receive <strong>$" + amount + (time == 0 ? " today" : (time == 7 ? " in 1 week" : (time == 14 ? " in 2 weeks" : (time == 30 ? " in 1 month" : (time == 60 ? " in 2 months" : (time == 90 ? " in 3 months" : (" in " + time + " days"))))))) + "</strong>";
   }
 
+  DEEPTime.prototype.finish = function() {
+    // Call the platform and tell it to put in the JSON and destroy DEEP
+    this.platform.finish(JSON.stringify(this.data));
+  }
+
   /**
    * Initializes DEEPQualtrics, which is the system that
    * connects to the Qualtrics survey and acts as the
@@ -209,10 +222,10 @@ Qualtrics.SurveyEngine.addOnload(function()
    * Conceptually, DEEPQualtrics extends IDEEPPlatform,
    * and it must implement certain methods that DEEPCore
    * will call.
-   * @param {object} qsEngine The Qualtrics engine. When loading inside Qualtrics.SurveyEngine, it is `this`.
+   * @param {object} qualtricsEngine The Qualtrics engine. When loading inside Qualtrics.SurveyEngine, it is `this`.
    */
-  var DEEPQualtrics = function(qsEngine) {
-    this.qsEngine = qsEngine;
+  var DEEPQualtrics = function(qualtricsEngine) {
+    this.qualtricsEngine = qualtricsEngine;
   }
 
   // ===========================================
@@ -234,11 +247,11 @@ Qualtrics.SurveyEngine.addOnload(function()
     var self = this;
 
     // Disable and hide the next button
-    this.qsEngine.disableNextButton();
+    this.qualtricsEngine.disableNextButton();
     jQuery('#NextButton').hide();
 
     // Save the question container reference
-    this.questionContainer = this.qsEngine.getQuestionContainer();
+    this.questionContainer = this.qualtricsEngine.getQuestionContainer();
 
     // Initialize DEEP UI framework
     jQuery(this.questionContainer).after(jQuery(this.HTML.bootstrap));
@@ -260,7 +273,7 @@ Qualtrics.SurveyEngine.addOnload(function()
     });
 
     jQuery('#DEEP-next-button').click(function(el){
-      self.nextQuestion();
+      self.submitChoice();
     });
   }
 
@@ -280,7 +293,7 @@ Qualtrics.SurveyEngine.addOnload(function()
     }
   }
 
-  DEEPQualtrics.prototype.nextQuestion = function() {
+  DEEPQualtrics.prototype.submitChoice = function() {
     // Get the selectedChoice
     var selectedChoice = this.getSelectedChoice();
 
@@ -289,7 +302,7 @@ Qualtrics.SurveyEngine.addOnload(function()
     // Save the choice
     this.DEEPCore.saveChoice(selectedChoice);
 
-    // Clear the choice
+    // Clear the choice for the next one
     this.clearChoice();
 
     // Get next question
@@ -320,11 +333,32 @@ Qualtrics.SurveyEngine.addOnload(function()
     jQuery('.DEEP-choice-cell').randomize();
   }
 
+  DEEPQualtrics.prototype.finish = function(dataJSON) {
+    // Inject JSON into answer field
+    this.qualtricsEngine.setChoiceValue('TEXT',dataJSON);
+
+    // Unhide and enable the next button
+    jQuery('#NextButton').show();
+    this.qualtricsEngine.enableNextButton();
+
+    // Show the original question container
+    jQuery(this.questionContainer).show();
+
+    // Apply CSS to this question container so it won't show up
+    jQuery(this.questionContainer).css('height','0').css('width','0').css('visibility','hidden').css('overflow','hidden');
+
+    // Destroy the DEEP UI
+    jQuery('#DEEP-question').remove();
+
+    // Advance to the next page
+    this.qualtricsEngine.clickNextButton();
+  }
+
   DEEPQualtrics.prototype.getDEEPID = function ()
   {
     // Find the DEEPID
-    var qsQuestionInfo = this.qsEngine.getQuestionInfo();
-    return qsQuestionInfo.QuestionText;
+    var qualtricsQuestionInfo = this.qualtricsEngine.getQuestionInfo();
+    return qualtricsQuestionInfo.QuestionText;
   }
 
   /**
@@ -440,7 +474,7 @@ Qualtrics.SurveyEngine.addOnload(function()
   // ============== Helper Functions ==============
   // ==============================================
 
-  var qsEngine = this;
+  var qualtricsEngine = this;
 
   // jQuery Randomize function
   // https://stackoverflow.com/questions/1533910/randomize-a-sequence-of-div-elements-with-jquery
@@ -456,6 +490,8 @@ Qualtrics.SurveyEngine.addOnload(function()
   };
   })(jQuery)
 
+  console.log(qualtricsEngine.getQuestionInfo());
+
   // ==================================
   // ============== Init ==============
   // ==================================
@@ -465,7 +501,7 @@ Qualtrics.SurveyEngine.addOnload(function()
 	} else {
 		DEEPLoaded = true;
 
-    var DEEP = new DEEPQualtrics(qsEngine);
+    var DEEP = new DEEPQualtrics(qualtricsEngine);
     DEEP.setup();
 	}
 });
