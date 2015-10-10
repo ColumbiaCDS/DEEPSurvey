@@ -10,9 +10,10 @@ October 9, 2015
 - Initial testing against current Qualtrics
 
 STILL TODO FOR QUALTRICS:
-- Integration of Risk
-- JSDoc and in-line documentation
+- JSDoc and in-line documentation for DEEPQualtrics
+- Check in-line documentation for DEEPCore
 - Validation and error handling
 - Warm-up questions
 - Consider using lz-string to compress itemRisks and codedIndexers or consider lazy-loading them dynamically
-- Separate out DEEPTime and core stuff into another file and use Gulp to combine them when needed
+- Separate out DEEPCore into another file and use Gulp to combine them when needed
+- Sanity check before finding choice (if (c2 * 2 + 1 < items.length )) in DEEPTime

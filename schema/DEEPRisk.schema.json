@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://jsonschema.net",
+  "type": "array",
+  "items": {
+    "id": "http://jsonschema.net/0",
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "title": "ID",
+        "description": "The ID of the given set of choices."
+      },
+      "alpha": {
+        "type": "number",
+        "title": "Alpha value"
+      },
+      "sigma": {
+        "type": "number",
+        "title": "Sigma value"
+      },
+      "lambda": {
+        "type": "number",
+        "title": "Lambda value"
+      },
+      "choice": {
+        "type": "integer",
+        "title": "Choice",
+        "description": "The choice given, either 0 or 1. Analogous to Answer, but zero-indexed."
+      },
+      "answer": {
+        "type": "integer",
+        "description": "The answer given, either 1 or 2.",
+        "title": "Answer"
+      }
+    }
+  }
+}
