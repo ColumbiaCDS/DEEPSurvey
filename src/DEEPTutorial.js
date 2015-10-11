@@ -68,6 +68,9 @@ DEEPTutorial.prototype.showWarmup = function() {
   // Inject warmup HTML, replacing introduction HTML
   jQuery('.DEEP-tutorial').html(this.HTML[this.DEEPType.toLowerCase()].warmup);
 
+  // Scroll window to top
+  window.scrollTo(0, 0);
+
   // Attach click handler to radio buttons
   jQuery('.DEEP-tutorial-question .DEEP-choice-input').click(function(el) {
     // Get the ID for the clicked element
