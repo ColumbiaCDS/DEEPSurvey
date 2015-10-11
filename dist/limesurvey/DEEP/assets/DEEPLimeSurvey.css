@@ -1,0 +1,81 @@
+div.DEEP-content {
+}
+
+div.DEEP-instructions {
+  padding: 20px;
+}
+
+div.DEEP-error {
+  text-align: center;
+  color: #ff0000;
+  margin: 10px 0;
+  display: none;
+}
+
+table.DEEP-choice-table {
+  width: 100%;
+}
+
+table.DEEP-choice-table.DEEP-choice-table-error {
+  background-color: #e5efff;
+}
+
+.DEEP-choice-label {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  width: 100%;
+  display: block;
+  text-align: center;
+  transition: background .3s, border .3s;
+  text-shadow: none !important;
+}
+
+.DEEP-choice-label:hover {
+  background-color: #E5EFFF;
+  border-color: #91B5F5;
+  cursor: pointer;
+}
+
+.DEEP-choice-label-selected {
+  background-color: #4B86EE;
+  border-color: #1351C1;
+  color: #fff;
+}
+
+.DEEP-choice-label-selected:hover {
+  background-color: #4B86EE;
+  border-color: #1351C1;
+}
+
+.DEEP-choice-input {
+  visibility: hidden;
+  height: 0px;
+  width: 0px;
+}
+
+.DEEP-buttons {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.DEEP-next-button {
+  border: none;
+  color: #fff !important;
+  font-size: 16px;
+  padding: 8px 20px;
+  border-radius: 4px;
+  background-color: #4378D6;
+  transition: background .3s;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  text-align: center;
+}
+
+.DEEP-next-button:hover {
+  background-color: #3667BC;
+}
+
+/* Tutorial */

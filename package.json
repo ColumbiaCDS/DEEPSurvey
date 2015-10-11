@@ -1,0 +1,19 @@
+{
+  "name": "integrateddeep",
+  "version": "1.0.0",
+  "description": "System for Integrated DEEP for Qualtrics and LimeSurvey.",
+  "directories": {
+    "doc": "doc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@vlab.decisionsciences.columbia.edu:IntegratedDEEP.git"
+  },
+  "author": "Mark Bao",
+  "license": "NA",
+  "dependencies": {
+    "gulp-include": "^2.0.2",
+    "gulp-rename": "^1.2.2",
+    "gulp-zip": "^3.0.2"
+  }
+}
