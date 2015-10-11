@@ -446,14 +446,9 @@ Qualtrics.SurveyEngine.addOnload(function()
       }
     } else {
       // A regular step, not first run
-      // TODO: Refactor this to just one function
-      
-      var choice0Index = this.getChoiceIndex(this.currentStep, this.path, 0);
-      var choice1Index = this.getChoiceIndex(this.currentStep, this.path, 1);
-
-      // Get the choice at that index for both options
-      this.currentChoice0 = this.getChoiceOption(0, choice0Index);
-      this.currentChoice1 = this.getChoiceOption(1, choice1Index);
+      // Get the next choices
+      this.currentChoice0 = this.getChoiceOption(0);
+      this.currentChoice1 = this.getChoiceOption(1);
     }
 
     // Get the choice text
@@ -510,7 +505,10 @@ Qualtrics.SurveyEngine.addOnload(function()
    *                               outcome0Chance, outcome0Amount, outcome1Chance,
    *                               outcome1Amount.
    */
-  DEEPCore.prototype.getChoiceOption = function(optionSet, choiceIndex) {
+  DEEPCore.prototype.getChoiceOption = function(optionSet) {
+    // Get the choice index
+    var choiceIndex = this.getChoiceIndex(this.currentStep, this.path, optionSet);
+
     var choiceOption = {};
 
     if (this.isDEEPTime()) {
@@ -601,12 +599,12 @@ Qualtrics.SurveyEngine.addOnload(function()
     var risks = {};
 
     if (this.isDEEPTime()) {
+      // Get the risks from the itemRisks array
       risks.beta = this.priors.time.itemRisks[step][itemRiskIndex]  / 100000.0;
       risks.discountRate = this.priors.time.itemRisks[step][itemRiskIndex + 1] / 100000.0;
     }
 
     if (this.isDEEPRisk()) {
-      console.log('running getrisks')
       if (step == 1) {
         // Step 1 has a different behavior than the others
         var risksSet = this.priors.risk.itemRisks[step][itemRiskIndex].split(",");
@@ -614,12 +612,9 @@ Qualtrics.SurveyEngine.addOnload(function()
         risks.sigma  = Number(risksSet[1]);
         risks.lambda = Number(risksSet[2]);
       } else {
-        console.log('running risk regular process')
+        // Fetch the risks with lots of math
         if ((itemRiskIndex + 1) * 13 <= this.priors.risk.itemRisks[step].length) {
-          console.log('running inside risk 479')
           var itemRisks = this.priors.risk.itemRisks[step];
-          console.log('itemrisks 481')
-          console.log(itemRisks)
           var n1 = this.decodeIndexer(itemRisks.charCodeAt(itemRiskIndex * 13 + 12));
           var e3 = Math.floor(n1 / 8)
           var sign = (Math.floor(((n1 % 8) / 4)) == 1) ? 1 : -1;
@@ -629,9 +624,6 @@ Qualtrics.SurveyEngine.addOnload(function()
           risks.alpha  = this.decodeRiskNumber(itemRisks.charCodeAt(itemRiskIndex * 13), itemRisks.charCodeAt(itemRiskIndex * 13 + 1), itemRisks.charCodeAt(itemRiskIndex * 13 + 2), itemRisks.charCodeAt(itemRiskIndex * 13 + 3), 1, e1, false);
           risks.sigma  = this.decodeRiskNumber(itemRisks.charCodeAt(itemRiskIndex * 13 + 4), itemRisks.charCodeAt(itemRiskIndex * 13 + 5), itemRisks.charCodeAt(itemRiskIndex * 13 + 6), itemRisks.charCodeAt(itemRiskIndex * 13 + 7), 1, e2, false);
           risks.lambda = this.decodeRiskNumber(itemRisks.charCodeAt(itemRiskIndex * 13 + 8), itemRisks.charCodeAt(itemRiskIndex * 13 + 9), itemRisks.charCodeAt(itemRiskIndex * 13 + 10), itemRisks.charCodeAt(itemRiskIndex * 13 + 11), sign, e3, true);
-
-          console.log('risks 493')
-          console.log(risks);
         }
       }
     }
@@ -1045,12 +1037,12 @@ Qualtrics.SurveyEngine.addOnload(function()
   // ============== Init ==============
   // ==================================
   
-	if (DEEPLoaded) {
-		alert("DEEP cannot be loaded twice on this page.");
-	} else {
-		DEEPLoaded = true;
+  if (DEEPLoaded) {
+    alert("DEEP cannot be loaded twice on this page.");
+  } else {
+    DEEPLoaded = true;
 
     var DEEP = new DEEPQualtrics(qualtricsEngine);
     DEEP.setup();
-	}
+  }
 });
