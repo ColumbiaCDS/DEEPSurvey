@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: DEEPQualtrics.js</title>
+    <title>JSDoc: Source: DEEPLimeSurvey.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: DEEPQualtrics.js</h1>
+    <h1 class="page-title">Source: DEEPLimeSurvey.js</h1>
 
     
 
@@ -26,19 +26,19 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>// ===========================================
-// ============== DEEPQualtrics ==============
-// ===========================================
+            <pre class="prettyprint source linenums"><code>// ============================================
+// ============== DEEPLimeSurvey ==============
+// ============================================
 
 /**
- * Initializes DEEPQualtrics, which is the system that
+ * Initializes DEEPLimeSurvey, which is the system that
  * connects to the Qualtrics survey and acts as the
  * middleman between DEEPCore and the Qualtrics survey.
- * @param {object} qualtricsEngine The Qualtrics engine. When loading inside Qualtrics.SurveyEngine, it is `this`.
+ * @param {String} questionCode The LimeSurvey question code for the DEEP input.
  * @constructor
  */
-var DEEPQualtrics = function(qualtricsEngine) {
-  this.qualtricsEngine = qualtricsEngine;
+var DEEPLimeSurvey = function(questionCode) {
+  this.questionCode = questionCode;
 
   // Set modes: skipTutorialMode
   if (typeof skipTutorialMode != 'undefined' &amp;&amp; skipTutorialMode === true) {
@@ -52,12 +52,11 @@ var DEEPQualtrics = function(qualtricsEngine) {
 }
 
 /**
- * Set up the DEEPQualtrics system. Stores the DEEP ID and bootstraps the UI.
+ * Set up the DEEPLimeSurvey system. Stores the DEEP ID and bootstraps the UI.
  * Checks that the DEEP ID is of a valid type and begins the tutorial.
  */
-DEEPQualtrics.prototype.setup = function() {
-  // Save the DEEPID
-  this.DEEPID = this.getDEEPID();
+DEEPLimeSurvey.prototype.setup = function() {
+  this.DEEPID = this.questionCode;
 
   // Build out UI framework
   this.bootstrapUI();
@@ -73,24 +72,17 @@ DEEPQualtrics.prototype.setup = function() {
  * Bootstraps the UI framework for DEEP. Removes the Qualtrics next button,
  * hides the question container, and injects the HTML/CSS for DEEP.
  */
-DEEPQualtrics.prototype.bootstrapUI = function() {
+DEEPLimeSurvey.prototype.bootstrapUI = function() {
   var self = this;
 
   // Disable and hide the next button
-  this.qualtricsEngine.disableNextButton();
-  jQuery('#NextButton').hide();
-
-  // Save the question container reference
-  this.questionContainer = this.qualtricsEngine.getQuestionContainer();
+  jQuery('#movenextbtn, #movesubmitbtn').hide();
 
   // Initialize DEEP UI framework
-  jQuery(this.questionContainer).after(jQuery(this.HTML.bootstrap));
+  jQuery('.DEEP-answer').after(jQuery(this.HTML.bootstrap));
 
-  // Inject CSS
-  jQuery('head').append('&lt;style>' + this.CSS.bootstrap + '&lt;/style>');
-
-  // Hide the original question container
-  jQuery(this.questionContainer).hide();
+  // Hide the DEEP answer
+  jQuery('.DEEP-answer').hide();
 }
 
 /**
@@ -99,7 +91,7 @@ DEEPQualtrics.prototype.bootstrapUI = function() {
  * beginDEEP() function as the completion callback for when DEEPTutorial
  * finishes.
  */
-DEEPQualtrics.prototype.beginTutorial = function() {
+DEEPLimeSurvey.prototype.beginTutorial = function() {
   var self = this;
 
   // Hide the DEEP-content container in preparation for the tutorial
@@ -121,7 +113,7 @@ DEEPQualtrics.prototype.beginTutorial = function() {
  * DEEPCore passing in the DEEP Type and the number of questions. Gets the
  * first question from DEEPCore and updates the choices shown in the UI.
  */
-DEEPQualtrics.prototype.beginDEEP = function() {
+DEEPLimeSurvey.prototype.beginDEEP = function() {
   var self = this;
 
   // Show DEEP-content again
@@ -155,7 +147,7 @@ DEEPQualtrics.prototype.beginDEEP = function() {
  * Returns the currently selected choice in the choice set.
  * @return {Number} The ID of the currently selected choice, 1 or 2.
  */
-DEEPQualtrics.prototype.getSelectedChoice = function() { 
+DEEPLimeSurvey.prototype.getSelectedChoice = function() { 
   var selectChoice = jQuery("input[type='radio'][name='DEEP-choice-selector']:checked");
   if (selectChoice.length > 0) {
     var choice = parseInt(selectChoice.val());
@@ -174,10 +166,10 @@ DEEPQualtrics.prototype.getSelectedChoice = function() {
  * to display the next choice, it clears the next choice and gets the next
  * question from DEEPCore. DEEPCore can return a set of choices, which
  * then get passed to updateChoices(), or it can also return false, which
- * means that DEEP is over, after which DEEPQualtrics will call finish() to
+ * means that DEEP is over, after which DEEPLimeSurvey will call finish() to
  * complete the DEEP process.
  */
-DEEPQualtrics.prototype.submitChoice = function() {
+DEEPLimeSurvey.prototype.submitChoice = function() {
   // Get the selectedChoice
   var selectedChoice = this.getSelectedChoice();
 
@@ -209,7 +201,7 @@ DEEPQualtrics.prototype.submitChoice = function() {
 /**
  * Clears the choices of their values and of error messages.
  */
-DEEPQualtrics.prototype.clearChoice = function() {
+DEEPLimeSurvey.prototype.clearChoice = function() {
   // Unselect the choice label
   jQuery('.DEEP-choice-label').removeClass('DEEP-choice-label-selected');
 
@@ -228,7 +220,7 @@ DEEPQualtrics.prototype.clearChoice = function() {
 /**
  * Shows an error message on the question.
  */
-DEEPQualtrics.prototype.showError = function() {
+DEEPLimeSurvey.prototype.showError = function() {
   // Show error message
   jQuery('.DEEP-error').show();
   jQuery('.DEEP-error').text('Please answer this question.')
@@ -243,7 +235,7 @@ DEEPQualtrics.prototype.showError = function() {
  * @param  {string} choice0 HTML text for the first choice.
  * @param  {string} choice1 HTML text for the second choice.
  */
-DEEPQualtrics.prototype.updateChoices = function(choice0, choice1) {
+DEEPLimeSurvey.prototype.updateChoices = function(choice0, choice1) {
   jQuery('#DEEP-choice-label-0').html(choice0);
   jQuery('#DEEP-choice-label-1').html(choice1); 
 
@@ -259,39 +251,27 @@ DEEPQualtrics.prototype.updateChoices = function(choice0, choice1) {
  * from, enables the Qualtrics next button, hides the question container,
  * destroys the DEEP UI, and clicks the next button to submit the data.
  */
-DEEPQualtrics.prototype.finish = function() {
+DEEPLimeSurvey.prototype.finish = function() {
   // Get the JSON from Core
   var dataJSON = this.DEEPCore.getJSON();
 
+  // Show the answer container
+  jQuery('.DEEP-answer').show();
+
+  // Apply CSS to the textarea so it won't show up
+  jQuery('.DEEP-answer textarea').css('height','0').css('width','0').css('visibility','hidden').css('overflow','hidden');
+
   // Inject JSON into answer field
-  this.qualtricsEngine.setChoiceValue('TEXT',dataJSON);
+  jQuery('.DEEP-answer textarea').val(dataJSON);
 
   // Unhide and enable the next button
-  jQuery('#NextButton').show();
-  this.qualtricsEngine.enableNextButton();
-
-  // Show the original question container
-  jQuery(this.questionContainer).show();
-
-  // Apply CSS to this question container so it won't show up
-  jQuery(this.questionContainer).css('height','0').css('width','0').css('visibility','hidden').css('overflow','hidden');
+  jQuery('#movenextbtn, #movesubmitbtn').show();
 
   // Destroy the DEEP UI
   jQuery('#DEEP-question').remove();
 
-  // Advance to the next page
-  this.qualtricsEngine.clickNextButton();
-}
-
-/**
- * Gets the DEEP ID, which is contained in the Qualtrics question text.
- * @return {String} The DEEP ID, or whatever is contained in the Qualtrics
- *                  question text.
- */
-DEEPQualtrics.prototype.getDEEPID = function () {
-  // Find the DEEPID
-  var qualtricsQuestionInfo = this.qualtricsEngine.getQuestionInfo();
-  return qualtricsQuestionInfo.QuestionText;
+  // Show the completion message
+  jQuery('.DEEP-answer').append('&lt;p>You may now continue the survey.&lt;/p>');
 }
 
 /**
@@ -300,7 +280,7 @@ DEEPQualtrics.prototype.getDEEPID = function () {
  * successfully found, or returns false if not.
  * @return {Boolean} True if the DEEP ID was valid, false if not.
  */
-DEEPQualtrics.prototype.validateDEEPID = function() {
+DEEPLimeSurvey.prototype.validateDEEPID = function() {
   // Validate that the DEEPID given is valid
   // DEEPID *may* be in the format "DEEPCore12"
   // First validate that it begins with DEEP
@@ -332,25 +312,25 @@ DEEPQualtrics.prototype.validateDEEPID = function() {
  * Stores the setting for skipping the tutorial.
  * @type {Boolean}
  */
-DEEPQualtrics.prototype.skipTutorialMode = false;
+DEEPLimeSurvey.prototype.skipTutorialMode = false;
 
 /**
  * Stores the setting for debug mode.
  * @type {Boolean}
  */
-DEEPQualtrics.prototype.debugMode = false;
+DEEPLimeSurvey.prototype.debugMode = false;
 
 /**
  * Stores boilerplate HTML code.
  * @type {Object}
  */
-DEEPQualtrics.prototype.HTML = {};
+DEEPLimeSurvey.prototype.HTML = {};
 
 /**
  * The standard framework used when setting up DEEP inside Qualtrics.
  * @type {String}
  */
-DEEPQualtrics.prototype.HTML.bootstrap =  '&lt;div class="DEEP-block" id="DEEP-question">\
+DEEPLimeSurvey.prototype.HTML.bootstrap =  '&lt;div class="DEEP-block" id="DEEP-question">\
                                               &lt;div class="DEEP-content">\
                                                 &lt;div class="DEEP-instructions">\
                                                   Please consider the two options below. Which of these two options do you find more attractive?\
@@ -375,92 +355,7 @@ DEEPQualtrics.prototype.HTML.bootstrap =  '&lt;div class="DEEP-block" id="DEEP-q
                                                   &lt;input type="button" class="DEEP-next-button" id="DEEP-next-button" value="Next">\
                                                 &lt;/div>\
                                               &lt;/div>\
-                                            &lt;/div>';
-
-/**
- * Stores boilerplate CSS code.
- * @type {Object}
- */
-DEEPQualtrics.prototype.CSS = {};
-
-/**
- * The standard CSS used when setting up DEEP inside Qualtrics.
- * @type {String}
- */
-DEEPQualtrics.prototype.CSS.bootstrap =  'div.DEEP-content {\
-                                          }\
-                                          div.DEEP-instructions {\
-                                            padding: 20px;\
-                                          }\
-                                          div.DEEP-error {\
-                                            text-align: center;\
-                                            color: #ff0000;\
-                                            margin: 10px 0;\
-                                            display: none;\
-                                          }\
-                                          \
-                                          table.DEEP-choice-table {\
-                                            width: 100%;\
-                                          }\
-                                          table.DEEP-choice-table.DEEP-choice-table-error {\
-                                            background-color: #e5efff;\
-                                          }\
-                                          \
-                                          .DEEP-choice-label {\
-                                            padding: 20px;\
-                                            background-color: #f9f9f9;\
-                                            border: 1px solid #ccc;\
-                                            border-radius: 2px;\
-                                            width: 100%;\
-                                            display: block;\
-                                            text-align: center;\
-                                            transition: background .3s, border .3s;\
-                                            text-shadow: none !important;\
-                                          }\
-                                          \
-                                          .DEEP-choice-label:hover {\
-                                            background-color: #E5EFFF;\
-                                            border-color: #91B5F5;\
-                                            cursor: pointer;\
-                                          }\
-                                          \
-                                          .DEEP-choice-label-selected {\
-                                            background-color: #4B86EE;\
-                                            border-color: #1351C1;\
-                                            color: #fff;\
-                                          }\
-                                          .DEEP-choice-label-selected:hover {\
-                                            background-color: #4B86EE;\
-                                            border-color: #1351C1;\
-                                          }\
-                                          .DEEP-choice-input {\
-                                            visibility: hidden;\
-                                            height: 0px;\
-                                            width: 0px;\
-                                          }\
-                                          \
-                                          .DEEP-buttons {\
-                                            margin-top: 20px;\
-                                            text-align: center;\
-                                          }\
-                                          .DEEP-next-button {\
-                                            border: none;\
-                                            color: #fff !important;\
-                                            font-size: 16px;\
-                                            padding: 8px 20px;\
-                                            border-radius: 4px;\
-                                            background-color: #4378D6;\
-                                            transition: background .3s;\
-                                            cursor: pointer;\
-                                            outline: none;\
-                                            -webkit-appearance: none;\
-                                            text-align: center;\
-                                          }\
-                                          \
-                                          .DEEP-next-button:hover {\
-                                            background-color: #3667BC;\
-                                          }';
-</code></pre>
+                                            &lt;/div>';</code></pre>
         </article>
     </section>
 
