@@ -27,11 +27,11 @@ October 11, 2015
   the tight connection between DEEPCore and DEEPQualtrics
   by not making DEEPCore call anything on the platform object.
 - Added validation/error handling
+- Added introduction and warm-up
 
 STILL TODO FOR QUALTRICS:
 - JSDoc and in-line documentation for DEEPQualtrics
 - Check in-line documentation for DEEPCore
-- Warm-up questions
 
 CONSIDER:
 - Consider using lz-string to compress itemRisks and codedIndexers or consider lazy-loading them dynamically
