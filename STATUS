@@ -11,10 +11,13 @@ October 9, 2015
 
 October 10, 2015
 ================
-- Refactored DEEPTime to DEEPCore
+- Refactored DEEPTime to DEEPCore; both DEEP Time and DEEP Risk
+  will use DEEPCore
+- Added selective code switches for DEEP Time and DEEP Risk
 - Implemented DEEP Risk
 - Documented DEEPCore
 - Fixed ID bugs
+- Refactored first run
 
 October 11, 2015
 ================
@@ -23,11 +26,11 @@ October 11, 2015
   renderChoices(), and parts of DEEPQualtrics, to decouple
   the tight connection between DEEPCore and DEEPQualtrics
   by not making DEEPCore call anything on the platform object.
+- Added validation/error handling
 
 STILL TODO FOR QUALTRICS:
 - JSDoc and in-line documentation for DEEPQualtrics
 - Check in-line documentation for DEEPCore
-- Validation and error handling
 - Warm-up questions
 
 CONSIDER:

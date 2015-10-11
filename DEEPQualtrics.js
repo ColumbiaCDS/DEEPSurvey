@@ -582,7 +582,7 @@ Qualtrics.SurveyEngine.addOnload(function()
     var e2 = n % 2;
     var real_e = isLambda ? (e2 * 4 + e - 5) : (e2 * 2 + e - 1);
     var result = sign * n2 * 0.000001 * Math.pow(10, real_e);
-    var stringResult = result.toFixed(11).replace(/0+$/, '');;
+    var stringResult = result.toFixed(11).replace(/0+$/, '');
     return Number(stringResult);
   }
 
@@ -723,6 +723,10 @@ Qualtrics.SurveyEngine.addOnload(function()
     return this.DEEPType == "RISK";
   }
 
+  // ===========================================
+  // ============== DEEPQualtrics ==============
+  // ===========================================
+
   /**
    * Initializes DEEPQualtrics, which is the system that
    * connects to the Qualtrics survey and acts as the
@@ -732,10 +736,6 @@ Qualtrics.SurveyEngine.addOnload(function()
   var DEEPQualtrics = function(qualtricsEngine) {
     this.qualtricsEngine = qualtricsEngine;
   }
-
-  // ===========================================
-  // ============== DEEPQualtrics ==============
-  // ===========================================
 
   DEEPQualtrics.prototype.setup = function() {
     // Save the DEEPID
@@ -808,34 +808,54 @@ Qualtrics.SurveyEngine.addOnload(function()
     // Get the selectedChoice
     var selectedChoice = this.getSelectedChoice();
 
-    // TODO: Validate
-    
-    // Save the choice
-    this.DEEPCore.saveChoice(selectedChoice);
+    if (selectedChoice === null) {
+      // User did not select a choice
+      this.showError();
+    } else {
+      // Save the choice
+      this.DEEPCore.saveChoice(selectedChoice);
 
-    // Clear the choice for the next one
-    this.clearChoice();
+      // Clear the choice for the next one
+      this.clearChoice();
 
-    // Get next question
-    var nextQuestion = this.DEEPCore.nextQuestion();
+      // Get next question
+      var nextQuestion = this.DEEPCore.nextQuestion();
 
-    if (nextQuestion === false) {
-      // DEEPCore says that we reached the end of DEEP
-      // So, call finish() which will get the JSON and
-      // deconstruct DEEP.
-      this.finish();
-    } else if (nextQuestion.constructor === Array && nextQuestion.length == 2) {
-      // Call updateChoices with the two new choices
-      this.updateChoices(nextQuestion[0], nextQuestion[1]);
+      if (nextQuestion === false) {
+        // DEEPCore says that we reached the end of DEEP
+        // So, call finish() which will get the JSON and
+        // deconstruct DEEP.
+        this.finish();
+      } else if (nextQuestion.constructor === Array && nextQuestion.length == 2) {
+        // Call updateChoices with the two new choices
+        this.updateChoices(nextQuestion[0], nextQuestion[1]);
+      }
     }
   }
 
   DEEPQualtrics.prototype.clearChoice = function() {
+    // Unselect the choice label
     jQuery('.DEEP-choice-label').removeClass('DEEP-choice-label-selected');
+
+    // Unselect the radio button
     var selectChoice = jQuery("input[type='radio'][name='DEEP-choice-selector']:checked");
     if (selectChoice.length > 0) {
       selectChoice.prop('checked', false);
     }
+
+    // Clear errrs
+    jQuery('.DEEP-error').hide();
+    jQuery('.DEEP-error').text('');
+    jQuery('.DEEP-choice-table').removeClass('DEEP-choice-table-error');
+  }
+
+  DEEPQualtrics.prototype.showError = function() {
+    // Show error message
+    jQuery('.DEEP-error').show();
+    jQuery('.DEEP-error').text('Please answer this question.')
+
+    // Highlight table
+    jQuery('.DEEP-choice-table').addClass('DEEP-choice-table-error');
   }
 
   /**
@@ -926,6 +946,8 @@ Qualtrics.SurveyEngine.addOnload(function()
                                                   <div class="DEEP-instructions">\
                                                     Please consider the two options below. Which of these two options do you find more attractive?\
                                                   </div>\
+                                                  <div class="DEEP-error">\
+                                                  </div>\
                                                   <div class="DEEP-choices">\
                                                     <table border="0" cellpadding="0" cellspacing="20" class="DEEP-choice-table">\
                                                       <tr>\
@@ -939,9 +961,9 @@ Qualtrics.SurveyEngine.addOnload(function()
                                                         </td>\
                                                       </tr>\
                                                     </table>\
-                                                    <div class="DEEP-buttons">\
-                                                      <input type="button" class="DEEP-next-button" id="DEEP-next-button" value="Next">\
-                                                    </div>\
+                                                  </div>\
+                                                  <div class="DEEP-buttons">\
+                                                    <input type="button" class="DEEP-next-button" id="DEEP-next-button" value="Next">\
                                                   </div>\
                                                 </div>\
                                               </div>';
@@ -961,9 +983,18 @@ Qualtrics.SurveyEngine.addOnload(function()
                                             div.DEEP-instructions {\
                                               padding: 20px;\
                                             }\
+                                            div.DEEP-error {\
+                                              text-align: center;\
+                                              color: #ff0000;\
+                                              margin: 10px 0;\
+                                              display: none;\
+                                            }\
                                             \
                                             table.DEEP-choice-table {\
                                               width: 100%;\
+                                            }\
+                                            table.DEEP-choice-table.DEEP-choice-table-error {\
+                                              background-color: #e5efff;\
                                             }\
                                             \
                                             .DEEP-choice-label {\
