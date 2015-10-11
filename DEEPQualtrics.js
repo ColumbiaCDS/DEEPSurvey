@@ -11,14 +11,13 @@ Qualtrics.SurveyEngine.addOnload(function()
    * questionCount given is valid, and then sets up variables.
    * DEEPCore includes all of the core logic for DEEP, including
    * data storage, question generation, and the user flow.
-   * DEEPCore invokes the platform, which handles the UI, when
-   * UI needs to be updated.
-   * @param {Object}  platform      The reference to the object containing
-   *                                the platform methods (Qualtrics/LimeSurvey).
+   * The platform that calls DEEPCore asks for data and updates
+   * their UI based on their own rules.
+   * @param {String}  DEEPType      The DEEP type to load, either RISK or TIME.
    * @param {Integer} questionCount The number of questions to ask for DEEP.
    * @constructor
    */
-  var DEEPCore = function(platform, DEEPType, questionCount) {
+  var DEEPCore = function(DEEPType, questionCount) {
     // Check that the number of questions is valid, under 12
     if (questionCount > 12) {
       alert('This survey has encountered an error. Please contact the survey administrator with the following error message: "DEEP Time initialized with more than 12 questions; more than 12 questions is unsupported."');
@@ -27,10 +26,6 @@ Qualtrics.SurveyEngine.addOnload(function()
       if (DEEPType == "TIME" || DEEPType == "RISK") {
         this.DEEPType = DEEPType;
         this.questionCount = questionCount;
-
-        // Set the class that called DEEPCore, e.g. an instance of
-        // DEEPQualtrics or DEEPLimeSurvey, so DEEPCore can communicate with it
-        this.platform = platform;
 
         console.log('DEEP - Initializing DEEP ' + this.DEEPType + ' with ' + questionCount + ' questions');
       } else {
@@ -271,10 +266,11 @@ Qualtrics.SurveyEngine.addOnload(function()
 
   /**
    * Begin the initialization of DEEP. First sets the initial
-   * values of the data for step 1, and then passes execution 
-   * to renderChoices(), which will recognize that the system
-   * has not been initialized and will use hard-coded initial
-   * values to set up the system.
+   * values of the data for step 1, and then returns the choice
+   * text by calling renderChoices(), which will recognize that
+   * the system has not been initialized and will use hard-coded
+   * initial values to set up the system and get the first choices.
+   * @return {Array} Returns an array with the first two choices.
    */
   DEEPCore.prototype.beginDEEP = function() {
     // Initialize data with initial ID, beta, and discount rate
@@ -292,8 +288,8 @@ Qualtrics.SurveyEngine.addOnload(function()
       this.data[this.currentStep].lambda = 2.2
     }
 
-    // Render the first choices
-    this.renderChoices();
+    // Return the array of the first choices
+    return this.renderChoices();
   }
 
   /**
@@ -376,17 +372,22 @@ Qualtrics.SurveyEngine.addOnload(function()
   /**
    * Get the next question. Checks whether the question maximum has
    * been reached; if so, invokes finish; if not, increases the
-   * current step and invokes renderChoices().
+   * current step and returns the choice text from renderChoices().
+   * @return {Array} Returns an array of the choices for the next
+   *                 question, or false if the maximum number of
+   *                 questions has been reached.
    */
   DEEPCore.prototype.nextQuestion = function() {
     // First check if the current step is the last step
     if (this.currentStep >= this.questionCount) {
       // Question limit reached
-      this.finish();
+      return false;
     } else {
       // Increment current step
       this.currentStep++;
-      this.renderChoices();
+
+      // Render the choices and return the array of choices
+      return this.renderChoices();
     }
   }
 
@@ -429,8 +430,9 @@ Qualtrics.SurveyEngine.addOnload(function()
    * index in the codedChoices0 and codedChoices1 to
    * find the corresponding choice to show. Whew!
    * <p>
-   * Once we save the choice text, then we ask the
-   * platform to update the choices.
+   * Once we save the choice text, then we return the
+   * array of the choice text.
+   * @return {Array} A two-item array of the text of the choices.
    */
   DEEPCore.prototype.renderChoices = function() {
     if (this.currentStep == 1 && this.initialized == false) {
@@ -452,11 +454,12 @@ Qualtrics.SurveyEngine.addOnload(function()
     }
 
     // Get the choice text
-    var choice0Text = this.getChoiceText(this.currentChoice0);
-    var choice1Text = this.getChoiceText(this.currentChoice1);
+    var choiceText    = [];
+    choiceText[0] = this.getChoiceText(this.currentChoice0);
+    choiceText[1] = this.getChoiceText(this.currentChoice1);
 
-    // Tell the platform to update the choice text
-    this.platform.updateChoices(choice0Text, choice1Text);
+    // Return the choice text
+    return choiceText;
   }
 
   /**
@@ -695,14 +698,11 @@ Qualtrics.SurveyEngine.addOnload(function()
   }
 
   /**
-   * Deconstructs the DEEP system when the question max has been reached.
-   * Converts the data to JSON and calls the platform to finish.
-   * The platform will destroy the DEEP system and return the data
-   * into the platform's data entry field.
+   * Converts the data into JSON and returns it.
+   * @return {String} The JSON string for the data.
    */
-  DEEPCore.prototype.finish = function() {
-    // Call the platform and tell it to put in the JSON and destroy DEEP
-    this.platform.finish(JSON.stringify(this.data));
+  DEEPCore.prototype.getJSON = function() {
+    return JSON.stringify(this.data);
   }
 
   /**
@@ -727,9 +727,6 @@ Qualtrics.SurveyEngine.addOnload(function()
    * Initializes DEEPQualtrics, which is the system that
    * connects to the Qualtrics survey and acts as the
    * middleman between DEEPCore and the Qualtrics survey.
-   * Conceptually, DEEPQualtrics extends IDEEPPlatform,
-   * and it must implement certain methods that DEEPCore
-   * will call.
    * @param {object} qualtricsEngine The Qualtrics engine. When loading inside Qualtrics.SurveyEngine, it is `this`.
    */
   var DEEPQualtrics = function(qualtricsEngine) {
@@ -748,11 +745,12 @@ Qualtrics.SurveyEngine.addOnload(function()
     // Validate that the DEEP ID is correct
     // If correctly validated, it will also set DEEPQuestionCount and DEEPType
     if (this.validateDEEPID()) {
-      // Initialize the first question, passing in this instance
-      // of DEEPQualtrics as an instance
-      
-      this.DEEPCore = new DEEPCore(this, this.DEEPType, this.DEEPQuestionCount);
-      this.DEEPCore.beginDEEP();
+      // Initialize the first question
+      this.DEEPCore = new DEEPCore(this.DEEPType, this.DEEPQuestionCount);
+
+      // Call beginDEEP, which will return an array of the questions
+      var firstQuestion = this.DEEPCore.beginDEEP();
+      this.updateChoices(firstQuestion[0], firstQuestion[1]);
     }
   }
 
@@ -819,7 +817,17 @@ Qualtrics.SurveyEngine.addOnload(function()
     this.clearChoice();
 
     // Get next question
-    this.DEEPCore.nextQuestion();
+    var nextQuestion = this.DEEPCore.nextQuestion();
+
+    if (nextQuestion === false) {
+      // DEEPCore says that we reached the end of DEEP
+      // So, call finish() which will get the JSON and
+      // deconstruct DEEP.
+      this.finish();
+    } else if (nextQuestion.constructor === Array && nextQuestion.length == 2) {
+      // Call updateChoices with the two new choices
+      this.updateChoices(nextQuestion[0], nextQuestion[1]);
+    }
   }
 
   DEEPQualtrics.prototype.clearChoice = function() {
@@ -831,13 +839,11 @@ Qualtrics.SurveyEngine.addOnload(function()
   }
 
   /**
-   * Updates the choices given in the UI. Required as a part of DEEPCore's
-   * specifications for DEEPPlatform.
+   * Updates the choices given in the UI.
    * @param  {string} choice0 HTML text for the first choice.
    * @param  {string} choice1 HTML text for the second choice.
    */
   DEEPQualtrics.prototype.updateChoices = function(choice0, choice1) {
-    console.log(choice1);
     jQuery('#DEEP-choice-label-0').html(choice0);
     jQuery('#DEEP-choice-label-1').html(choice1); 
 
@@ -847,7 +853,10 @@ Qualtrics.SurveyEngine.addOnload(function()
     }
   }
 
-  DEEPQualtrics.prototype.finish = function(dataJSON) {
+  DEEPQualtrics.prototype.finish = function() {
+    // Get the JSON from Core
+    var dataJSON = this.DEEPCore.getJSON();
+
     // Inject JSON into answer field
     this.qualtricsEngine.setChoiceValue('TEXT',dataJSON);
 
@@ -1030,8 +1039,6 @@ Qualtrics.SurveyEngine.addOnload(function()
       return this;
   };
   })(jQuery)
-
-  console.log(qualtricsEngine.getQuestionInfo());
 
   // ==================================
   // ============== Init ==============

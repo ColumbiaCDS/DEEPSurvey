@@ -19,6 +19,10 @@ October 10, 2015
 October 11, 2015
 ================
 - Minor refactor of getChoiceOption to make it more compact
+- Refactored DEEPCore.nextQuestion and .beginDEEP() and
+  renderChoices(), and parts of DEEPQualtrics, to decouple
+  the tight connection between DEEPCore and DEEPQualtrics
+  by not making DEEPCore call anything on the platform object.
 
 STILL TODO FOR QUALTRICS:
 - JSDoc and in-line documentation for DEEPQualtrics
