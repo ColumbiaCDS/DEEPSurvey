@@ -728,51 +728,94 @@ Qualtrics.SurveyEngine.addOnload(function()
   // ============== DEEPTutorial ==============
   // ==========================================
   
+  /**
+   * DEEPTutorial is the system that controls the initial tutorial, i.e. the
+   * introduction and the warmup exercise that the user goes through before
+   * starting DEEP. DEEPTutorial manages mostly its own HTML/CSS, and does the
+   * flow logic and validates the warmup exercise answers to check for
+   * correctness, and also handles error messages. It holds the HTML templates
+   * for the introduction and warmup exercise for DEEP Time and DEEP Risk,
+   * and checks answers against the correct answers, hard-coded in this class.
+   * Once the tutorial is over, it executes finishCallback() which calls back
+   * to the caller's finish function (the platform's beginDEEP() function).
+   * <p>
+   * DEEPTutorial piggybacks off of some CSS provided by the platform's CSS,
+   * .DEEP-choice-label, .DEEP-choice-input, and .DEEP-next-button. This way,
+   * DEEPTutorial can reduce code duplication. The platform must have these
+   * fields styled. All other CSS is provided by DEEPTutorial.
+   * <p>
+   * Lifecycle: Called by the platform, initializes boilerplate HTML, injects
+   * CSS, initializes introduction, waits for user to click Continue, renders
+   * the warmup exercise and attaches click handlers, waits for user response,
+   * validates answers and shows error messages, and finally calls the method
+   * that the platform (that originally called DEEPTutorial) specified as the
+   * callback to execute when finished.
+   * @param {String} DEEPType         The type of DEEP, either TIME or RISK.
+   * @param {Function} finishCallback The function to execute when finished
+   *                                  with the tutorial; usually the platform's
+   *                                  beginDEEP() function.
+   * @constructor
+   */
   var DEEPTutorial = function(DEEPType, finishCallback) {
+    // Set the DEEP Type and the completion callback
     this.DEEPType = DEEPType;
     this.finishCallback = finishCallback;
   }
 
+  /**
+   * Begins the tutorial process. Injects CSS, adds boilerplate HTML, and adds
+   * the HTML for the intro for the current DEEP type.
+   */
   DEEPTutorial.prototype.begin = function() {
     var self = this;
 
     // Inject CSS
     jQuery('head').append('<style>' + this.CSS.bootstrap + '</style>');
 
-    // Inject HTML of the tutorial
+    // Inject tutorial boilerplate inside the .DEEP-block
     jQuery('.DEEP-block').append(this.HTML.bootstrap);
-    console.log(this.DEEPType);
 
     // Inject HTML of the introduction for the corresponding DEEP type
     jQuery('.DEEP-tutorial').html(this.HTML[this.DEEPType.toLowerCase()].introduction);
+
+    // Add click handler to hook up the submit button to the showWarmup() function
     jQuery('#DEEP-tutorial-introduction-button').click(function(){
       self.showWarmup();
     });
   }
 
+  /**
+   * Shows the warmup exercise and attaches the click handlers for the radio
+   * select buttons and the submit button.
+   */
   DEEPTutorial.prototype.showWarmup = function() {
     var self = this;
-    // Inject warmup HTML
+
+    // Inject warmup HTML, replacing introduction HTML
     jQuery('.DEEP-tutorial').html(this.HTML[this.DEEPType.toLowerCase()].warmup);
 
     // Attach click handler to radio buttons
     jQuery('.DEEP-tutorial-question .DEEP-choice-input').click(function(el) {
-      // Get the ID for this element
+      // Get the ID for the clicked element
       var choiceID = jQuery(this).attr('id');
 
       // Remove selected class from all choice labels in this element's parent (the question block)
       jQuery(this).parent().find('.DEEP-choice-label').removeClass('DEEP-choice-label-selected');
 
-      // Find the label that corresponds to this ID and add the selected class
+      // Find the label that set its "for" to this elemetn's ID and add the selected class
       jQuery('label[for="' + choiceID + '"]').addClass('DEEP-choice-label-selected');
     });
 
-    // Next button click hook
+    // Add click hook to the next button to submit the warmup
     jQuery('#DEEP-tutorial-warmup-button').click(function(el) {
       self.submitWarmup();
     });
   }
 
+  /**
+   * Submits the warmup exercise. First validates the answers to make sure they
+   * are correct, and if so, calls the completion callback given by the caller.
+   */
   DEEPTutorial.prototype.submitWarmup = function() {
     // Validate warmup
     if (this.validateWarmup()) {
@@ -784,6 +827,13 @@ Qualtrics.SurveyEngine.addOnload(function()
     }
   }
 
+  /**
+   * Validates the answers given in the warmup exercise. Checks answers against
+   * the warmupAnswers array for DEEP Time or DEEP Risk, which contains the
+   * correct answers ordered by the question index. Shows an error message and
+   * returns false if there are errors; returns true if all answers match up.
+   * @return {Boolean} Returns true if all answers are correct.
+   */
   DEEPTutorial.prototype.validateWarmup = function() {
     var validated = true;
 
@@ -815,9 +865,23 @@ Qualtrics.SurveyEngine.addOnload(function()
     return validated;
   }
 
+  /**
+   * Contains the answers for the warmup exercises for the DEEP types.
+   * @type {Object}
+   */
   DEEPTutorial.prototype.warmupAnswers = {};
-  DEEPTutorial.prototype.warmupAnswers.risk = ["20", "true", "90", "-1"];
+
+  /**
+   * Contains the answers for the warmup exercise for DEEP Time.
+   * @type {Array}
+   */
   DEEPTutorial.prototype.warmupAnswers.time = ["30", "0", "20"];
+
+  /**
+   * Contains the answers for the warmup exercise for DEEP Risk.
+   * @type {Array}
+   */
+  DEEPTutorial.prototype.warmupAnswers.risk = ["20", "true", "90", "-1"];
 
   /**
    * Helper method that returns whether the current DEEP
@@ -1097,9 +1161,15 @@ Qualtrics.SurveyEngine.addOnload(function()
     this.qualtricsEngine = qualtricsEngine;
   }
 
+  /**
+   * Set up the DEEPQualtrics system. Stores the DEEP ID and bootstraps the UI.
+   * Checks that the DEEP ID is of a valid type and begins the tutorial.
+   */
   DEEPQualtrics.prototype.setup = function() {
     // Save the DEEPID
     this.DEEPID = this.getDEEPID();
+
+    // Build out UI framework
     this.bootstrapUI();
 
     // Validate that the DEEP ID is correct
@@ -1109,6 +1179,10 @@ Qualtrics.SurveyEngine.addOnload(function()
     }
   }
 
+  /**
+   * Bootstraps the UI framework for DEEP. Removes the Qualtrics next button,
+   * hides the question container, and injects the HTML/CSS for DEEP.
+   */
   DEEPQualtrics.prototype.bootstrapUI = function() {
     var self = this;
 
@@ -1129,6 +1203,12 @@ Qualtrics.SurveyEngine.addOnload(function()
     jQuery(this.questionContainer).hide();
   }
 
+  /**
+   * Begins the tutorial prior to the main DEEP process. Hides the main DEEP
+   * content container, and initializes the DEEPTutorial, passing in the
+   * beginDEEP() function as the completion callback for when DEEPTutorial
+   * finishes.
+   */
   DEEPQualtrics.prototype.beginTutorial = function() {
     var self = this;
 
@@ -1136,6 +1216,7 @@ Qualtrics.SurveyEngine.addOnload(function()
     jQuery('.DEEP-content').hide();
 
     // Check if we are in skipTutorial mode
+    // TODO: Refactor this into the constructor
     if (typeof skipTutorial != 'undefined' && skipTutorial === true) {
       // Go directly to DEEP
       this.beginDEEP();
@@ -1146,7 +1227,15 @@ Qualtrics.SurveyEngine.addOnload(function()
     }
   }
 
+  /**
+   * Begins the DEEP process. Adds click hooks to the radio buttons, adds the
+   * hook to the next button, and initializes the DEEP system by calling
+   * DEEPCore passing in the DEEP Type and the number of questions. Gets the
+   * first question from DEEPCore and updates the choices shown in the UI.
+   */
   DEEPQualtrics.prototype.beginDEEP = function() {
+    var self = this;
+
     // Show DEEP-content again
     jQuery('.DEEP-content').show();
 
@@ -1176,7 +1265,7 @@ Qualtrics.SurveyEngine.addOnload(function()
 
   /**
    * Returns the currently selected choice in the choice set.
-   * @return {number} The ID of the currently selected choice, 1 or 2.
+   * @return {Number} The ID of the currently selected choice, 1 or 2.
    */
   DEEPQualtrics.prototype.getSelectedChoice = function() { 
     var selectChoice = jQuery("input[type='radio'][name='DEEP-choice-selector']:checked");
@@ -1190,6 +1279,16 @@ Qualtrics.SurveyEngine.addOnload(function()
     }
   }
 
+  /**
+   * Handler for the Submit button that is clicked after a user selects a
+   * choice. Checks if a choice has been selected (if not, shows an error),
+   * then calls DEEPCore.saveChoice() to save the selected choice. Then,
+   * to display the next choice, it clears the next choice and gets the next
+   * question from DEEPCore. DEEPCore can return a set of choices, which
+   * then get passed to updateChoices(), or it can also return false, which
+   * means that DEEP is over, after which DEEPQualtrics will call finish() to
+   * complete the DEEP process.
+   */
   DEEPQualtrics.prototype.submitChoice = function() {
     // Get the selectedChoice
     var selectedChoice = this.getSelectedChoice();
@@ -1219,6 +1318,9 @@ Qualtrics.SurveyEngine.addOnload(function()
     }
   }
 
+  /**
+   * Clears the choices of their values and of error messages.
+   */
   DEEPQualtrics.prototype.clearChoice = function() {
     // Unselect the choice label
     jQuery('.DEEP-choice-label').removeClass('DEEP-choice-label-selected');
@@ -1235,6 +1337,9 @@ Qualtrics.SurveyEngine.addOnload(function()
     jQuery('.DEEP-choice-table').removeClass('DEEP-choice-table-error');
   }
 
+  /**
+   * Shows an error message on the question.
+   */
   DEEPQualtrics.prototype.showError = function() {
     // Show error message
     jQuery('.DEEP-error').show();
@@ -1245,7 +1350,8 @@ Qualtrics.SurveyEngine.addOnload(function()
   }
 
   /**
-   * Updates the choices given in the UI.
+   * Updates the choices given in the UI. In DEEP Time, it randomizes the order
+   * of the choices.
    * @param  {string} choice0 HTML text for the first choice.
    * @param  {string} choice1 HTML text for the second choice.
    */
@@ -1259,6 +1365,12 @@ Qualtrics.SurveyEngine.addOnload(function()
     }
   }
 
+  /**
+   * Finishes the DEEP process and deconstructs DEEP. First, it gets the JSON
+   * string from DEEPCore, inserts it into the text area that DEEP was called
+   * from, enables the Qualtrics next button, hides the question container,
+   * destroys the DEEP UI, and clicks the next button to submit the data.
+   */
   DEEPQualtrics.prototype.finish = function() {
     // Get the JSON from Core
     var dataJSON = this.DEEPCore.getJSON();
@@ -1283,12 +1395,23 @@ Qualtrics.SurveyEngine.addOnload(function()
     this.qualtricsEngine.clickNextButton();
   }
 
+  /**
+   * Gets the DEEP ID, which is contained in the Qualtrics question text.
+   * @return {String} The DEEP ID, or whatever is contained in the Qualtrics
+   *                  question text.
+   */
   DEEPQualtrics.prototype.getDEEPID = function () {
     // Find the DEEPID
     var qualtricsQuestionInfo = this.qualtricsEngine.getQuestionInfo();
     return qualtricsQuestionInfo.QuestionText;
   }
 
+  /**
+   * Validates the DEEP ID by using a regex to find the DEEP Type and number of
+   * questions; saves them to this.DEEPType and this.DEEPQuestionCount if
+   * successfully found, or returns false if not.
+   * @return {Boolean} True if the DEEP ID was valid, false if not.
+   */
   DEEPQualtrics.prototype.validateDEEPID = function() {
     // Validate that the DEEPID given is valid
     // DEEPID *may* be in the format "DEEPCore12"

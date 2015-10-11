@@ -29,10 +29,10 @@ October 11, 2015
 - Added validation/error handling
 - Added introduction and warm-up
 - Added mode to skip the tutorial
+- Updated documentation for DEEPQualtrics
+- Added documentation for DEEPTutorial
 
 STILL TODO FOR QUALTRICS:
-- JSDoc and in-line documentation for DEEPQualtrics
-- Check in-line documentation for DEEPCore
 
 CONSIDER:
 - Consider using lz-string to compress itemRisks and codedIndexers or consider lazy-loading them dynamically
