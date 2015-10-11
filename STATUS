@@ -31,8 +31,7 @@ October 11, 2015
 - Added mode to skip the tutorial
 - Updated documentation for DEEPQualtrics
 - Added documentation for DEEPTutorial
-
-STILL TODO FOR QUALTRICS:
+- Refactored skipTutorial and added debugMode
 
 CONSIDER:
 - Consider using lz-string to compress itemRisks and codedIndexers or consider lazy-loading them dynamically

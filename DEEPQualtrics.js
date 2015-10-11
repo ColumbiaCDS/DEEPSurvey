@@ -1,7 +1,8 @@
 Qualtrics.SurveyEngine.addOnload(function()
 {
   var DEEPLoaded = false;
-  var skipTutorial = false;
+  var skipTutorialMode = false;
+  var debugMode = true;
 
   // ======================================
   // ============== DEEPCore ==============
@@ -28,7 +29,14 @@ Qualtrics.SurveyEngine.addOnload(function()
         this.DEEPType = DEEPType;
         this.questionCount = questionCount;
 
-        console.log('DEEP - Initializing DEEP ' + this.DEEPType + ' with ' + questionCount + ' questions');
+        // Set modes: debugMode
+        if (typeof debugMode != 'undefined' && debugMode === true) {
+          this.debugMode = true;
+        }
+
+        if (this.debugMode) {
+          console.log('DEEP - Initializing DEEP ' + this.DEEPType + ' with ' + questionCount + ' questions');
+        }
       } else {
         alert('This survey has encountered an error. Please contact the survey administrator with the following error message: "Invalid DEEP variant requested. DEEP ID must be DEEPTIME or DEEPRISK."');
       }
@@ -341,7 +349,10 @@ Qualtrics.SurveyEngine.addOnload(function()
       this.data[this.currentStep + 1]['lambda'] = risks.lambda;
     }
 
-    console.log(this.data);
+    if (this.debugMode) {
+      console.log('Saved data for step ' + this.currentStep);
+      console.log(this.data);
+    }
   }
 
   /**
@@ -1159,6 +1170,16 @@ Qualtrics.SurveyEngine.addOnload(function()
    */
   var DEEPQualtrics = function(qualtricsEngine) {
     this.qualtricsEngine = qualtricsEngine;
+
+    // Set modes: skipTutorialMode
+    if (typeof skipTutorialMode != 'undefined' && skipTutorialMode === true) {
+      this.skipTutorialMode = true;
+    }
+
+    // Set modes: debugMode
+    if (typeof debugMode != 'undefined' && debugMode === true) {
+      this.debugMode = true;
+    }
   }
 
   /**
@@ -1215,9 +1236,7 @@ Qualtrics.SurveyEngine.addOnload(function()
     // Hide the DEEP-content container in preparation for the tutorial
     jQuery('.DEEP-content').hide();
 
-    // Check if we are in skipTutorial mode
-    // TODO: Refactor this into the constructor
-    if (typeof skipTutorial != 'undefined' && skipTutorial === true) {
+    if (this.skipTutorialMode) {
       // Go directly to DEEP
       this.beginDEEP();
     } else {
@@ -1439,6 +1458,18 @@ Qualtrics.SurveyEngine.addOnload(function()
       return false;
     }
   }
+
+  /**
+   * Stores the setting for skipping the tutorial.
+   * @type {Boolean}
+   */
+  DEEPQualtrics.prototype.skipTutorialMode = false;
+
+  /**
+   * Stores the setting for debug mode.
+   * @type {Boolean}
+   */
+  DEEPQualtrics.prototype.debugMode = false;
 
   /**
    * Stores boilerplate HTML code.
