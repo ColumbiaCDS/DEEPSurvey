@@ -28,6 +28,7 @@ October 11, 2015
   by not making DEEPCore call anything on the platform object.
 - Added validation/error handling
 - Added introduction and warm-up
+- Added mode to skip the tutorial
 
 STILL TODO FOR QUALTRICS:
 - JSDoc and in-line documentation for DEEPQualtrics

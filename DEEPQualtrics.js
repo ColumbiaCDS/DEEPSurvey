@@ -1,6 +1,7 @@
 Qualtrics.SurveyEngine.addOnload(function()
 {
   var DEEPLoaded = false;
+  var skipTutorial = false;
 
   // ======================================
   // ============== DEEPCore ==============
@@ -1134,9 +1135,15 @@ Qualtrics.SurveyEngine.addOnload(function()
     // Hide the DEEP-content container in preparation for the tutorial
     jQuery('.DEEP-content').hide();
 
-    // Call a new DEEPTutorial passing in the completion callback this.beginDEEP();
-    this.DEEPTutorial = new DEEPTutorial(this.DEEPType, function() { self.beginDEEP(); });
-    this.DEEPTutorial.begin();
+    // Check if we are in skipTutorial mode
+    if (typeof skipTutorial != 'undefined' && skipTutorial === true) {
+      // Go directly to DEEP
+      this.beginDEEP();
+    } else {
+      // Call a new DEEPTutorial passing in the completion callback this.beginDEEP();
+      this.DEEPTutorial = new DEEPTutorial(this.DEEPType, function() { self.beginDEEP(); });
+      this.DEEPTutorial.begin();
+    }
   }
 
   DEEPQualtrics.prototype.beginDEEP = function() {
