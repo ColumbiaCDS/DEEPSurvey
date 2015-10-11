@@ -7,14 +7,13 @@
  * questionCount given is valid, and then sets up variables.
  * DEEPCore includes all of the core logic for DEEP, including
  * data storage, question generation, and the user flow.
- * DEEPCore invokes the platform, which handles the UI, when
- * UI needs to be updated.
- * @param {Object}  platform      The reference to the object containing
- *                                the platform methods (Qualtrics/LimeSurvey).
+ * The platform that calls DEEPCore asks for data and updates
+ * their UI based on their own rules.
+ * @param {String}  DEEPType      The DEEP type to load, either RISK or TIME.
  * @param {Integer} questionCount The number of questions to ask for DEEP.
  * @constructor
  */
-var DEEPCore = function(platform, DEEPType, questionCount) {
+var DEEPCore = function(DEEPType, questionCount) {
   // Check that the number of questions is valid, under 12
   if (questionCount > 12) {
     alert('This survey has encountered an error. Please contact the survey administrator with the following error message: "DEEP Time initialized with more than 12 questions; more than 12 questions is unsupported."');
@@ -24,11 +23,14 @@ var DEEPCore = function(platform, DEEPType, questionCount) {
       this.DEEPType = DEEPType;
       this.questionCount = questionCount;
 
-      // Set the class that called DEEPCore, e.g. an instance of
-      // DEEPQualtrics or DEEPLimeSurvey, so DEEPCore can communicate with it
-      this.platform = platform;
+      // Set modes: debugMode
+      if (typeof debugMode != 'undefined' && debugMode === true) {
+        this.debugMode = true;
+      }
 
-      console.log('DEEP - Initializing DEEP ' + this.DEEPType + ' with ' + questionCount + ' questions');
+      if (this.debugMode) {
+        console.log('DEEP - Initializing DEEP ' + this.DEEPType + ' with ' + questionCount + ' questions');
+      }
     } else {
       alert('This survey has encountered an error. Please contact the survey administrator with the following error message: "Invalid DEEP variant requested. DEEP ID must be DEEPTIME or DEEPRISK."');
     }
@@ -267,10 +269,11 @@ DEEPCore.prototype.priors.risk.codedChoices1 = [[100, 0.3, -20, 0.7], [40, 0.5, 
 
 /**
  * Begin the initialization of DEEP. First sets the initial
- * values of the data for step 1, and then passes execution 
- * to renderChoices(), which will recognize that the system
- * has not been initialized and will use hard-coded initial
- * values to set up the system.
+ * values of the data for step 1, and then returns the choice
+ * text by calling renderChoices(), which will recognize that
+ * the system has not been initialized and will use hard-coded
+ * initial values to set up the system and get the first choices.
+ * @return {Array} Returns an array with the first two choices.
  */
 DEEPCore.prototype.beginDEEP = function() {
   // Initialize data with initial ID, beta, and discount rate
@@ -288,8 +291,8 @@ DEEPCore.prototype.beginDEEP = function() {
     this.data[this.currentStep].lambda = 2.2
   }
 
-  // Render the first choices
-  this.renderChoices();
+  // Return the array of the first choices
+  return this.renderChoices();
 }
 
 /**
@@ -340,7 +343,10 @@ DEEPCore.prototype.saveChoice = function(choice) {
     this.data[this.currentStep + 1]['lambda'] = risks.lambda;
   }
 
-  console.log(this.data);
+  if (this.debugMode) {
+    console.log('Saved data for step ' + this.currentStep);
+    console.log(this.data);
+  }
 }
 
 /**
@@ -372,17 +378,22 @@ DEEPCore.prototype.getCurrentPath = function() {
 /**
  * Get the next question. Checks whether the question maximum has
  * been reached; if so, invokes finish; if not, increases the
- * current step and invokes renderChoices().
+ * current step and returns the choice text from renderChoices().
+ * @return {Array} Returns an array of the choices for the next
+ *                 question, or false if the maximum number of
+ *                 questions has been reached.
  */
 DEEPCore.prototype.nextQuestion = function() {
   // First check if the current step is the last step
   if (this.currentStep >= this.questionCount) {
     // Question limit reached
-    this.finish();
+    return false;
   } else {
     // Increment current step
     this.currentStep++;
-    this.renderChoices();
+
+    // Render the choices and return the array of choices
+    return this.renderChoices();
   }
 }
 
@@ -425,8 +436,11 @@ DEEPCore.prototype.nextQuestion = function() {
  * index in the codedChoices0 and codedChoices1 to
  * find the corresponding choice to show. Whew!
  * <p>
- * Once we save the choice text, then we ask the
- * platform to update the choices.
+ * Once we save the choice text, then we return the
+ * array of the choice text.
+ * @return {Array} A two-item array of the text of the choices.
+ * @see {@link DEEPCore#getChoiceOption}
+ * @see {@link DEEPCore#getChoiceIndex}
  */
 DEEPCore.prototype.renderChoices = function() {
   if (this.currentStep == 1 && this.initialized == false) {
@@ -442,22 +456,18 @@ DEEPCore.prototype.renderChoices = function() {
     }
   } else {
     // A regular step, not first run
-    // TODO: Refactor this to just one function
-    
-    var choice0Index = this.getChoiceIndex(this.currentStep, this.path, 0);
-    var choice1Index = this.getChoiceIndex(this.currentStep, this.path, 1);
-
-    // Get the choice at that index for both options
-    this.currentChoice0 = this.getChoiceOption(0, choice0Index);
-    this.currentChoice1 = this.getChoiceOption(1, choice1Index);
+    // Get the next choices
+    this.currentChoice0 = this.getChoiceOption(0);
+    this.currentChoice1 = this.getChoiceOption(1);
   }
 
   // Get the choice text
-  var choice0Text = this.getChoiceText(this.currentChoice0);
-  var choice1Text = this.getChoiceText(this.currentChoice1);
+  var choiceText = [];
+  choiceText[0]  = this.getChoiceText(this.currentChoice0);
+  choiceText[1]  = this.getChoiceText(this.currentChoice1);
 
-  // Tell the platform to update the choice text
-  this.platform.updateChoices(choice0Text, choice1Text);
+  // Return the choice text
+  return choiceText;
 }
 
 /**
@@ -472,6 +482,7 @@ DEEPCore.prototype.renderChoices = function() {
  *                             for codedChoices0 or codedChoices1.
  * @return {Integer}           The array index for looking up on
  *                             codedChoices0 or codedChoices1.
+ * @see    {@link DEEPCore#renderChoices}
  */
 DEEPCore.prototype.getChoiceIndex = function(step, path, choiceNum) {
   var choiceCodedIndexer;
@@ -505,8 +516,12 @@ DEEPCore.prototype.getChoiceIndex = function(step, path, choiceNum) {
  *                               In DEEP Time: amount, time. In DEEP Risk:
  *                               outcome0Chance, outcome0Amount, outcome1Chance,
  *                               outcome1Amount.
+ * @see    {@link DEEPCore#renderChoices}
  */
-DEEPCore.prototype.getChoiceOption = function(optionSet, choiceIndex) {
+DEEPCore.prototype.getChoiceOption = function(optionSet) {
+  // Get the choice index
+  var choiceIndex = this.getChoiceIndex(this.currentStep, this.path, optionSet);
+
   var choiceOption = {};
 
   if (this.isDEEPTime()) {
@@ -577,7 +592,7 @@ DEEPCore.prototype.decodeRiskNumber = function MydeCodeNumber(s0, s1, s2, s3, si
   var e2 = n % 2;
   var real_e = isLambda ? (e2 * 4 + e - 5) : (e2 * 2 + e - 1);
   var result = sign * n2 * 0.000001 * Math.pow(10, real_e);
-  var stringResult = result.toFixed(11).replace(/0+$/, '');;
+  var stringResult = result.toFixed(11).replace(/0+$/, '');
   return Number(stringResult);
 }
 
@@ -597,12 +612,12 @@ DEEPCore.prototype.getRisks = function(step, itemRiskIndex) {
   var risks = {};
 
   if (this.isDEEPTime()) {
+    // Get the risks from the itemRisks array
     risks.beta = this.priors.time.itemRisks[step][itemRiskIndex]  / 100000.0;
     risks.discountRate = this.priors.time.itemRisks[step][itemRiskIndex + 1] / 100000.0;
   }
 
   if (this.isDEEPRisk()) {
-    console.log('running getrisks')
     if (step == 1) {
       // Step 1 has a different behavior than the others
       var risksSet = this.priors.risk.itemRisks[step][itemRiskIndex].split(",");
@@ -610,12 +625,9 @@ DEEPCore.prototype.getRisks = function(step, itemRiskIndex) {
       risks.sigma  = Number(risksSet[1]);
       risks.lambda = Number(risksSet[2]);
     } else {
-      console.log('running risk regular process')
+      // Fetch the risks with lots of math
       if ((itemRiskIndex + 1) * 13 <= this.priors.risk.itemRisks[step].length) {
-        console.log('running inside risk 479')
         var itemRisks = this.priors.risk.itemRisks[step];
-        console.log('itemrisks 481')
-        console.log(itemRisks)
         var n1 = this.decodeIndexer(itemRisks.charCodeAt(itemRiskIndex * 13 + 12));
         var e3 = Math.floor(n1 / 8)
         var sign = (Math.floor(((n1 % 8) / 4)) == 1) ? 1 : -1;
@@ -625,9 +637,6 @@ DEEPCore.prototype.getRisks = function(step, itemRiskIndex) {
         risks.alpha  = this.decodeRiskNumber(itemRisks.charCodeAt(itemRiskIndex * 13), itemRisks.charCodeAt(itemRiskIndex * 13 + 1), itemRisks.charCodeAt(itemRiskIndex * 13 + 2), itemRisks.charCodeAt(itemRiskIndex * 13 + 3), 1, e1, false);
         risks.sigma  = this.decodeRiskNumber(itemRisks.charCodeAt(itemRiskIndex * 13 + 4), itemRisks.charCodeAt(itemRiskIndex * 13 + 5), itemRisks.charCodeAt(itemRiskIndex * 13 + 6), itemRisks.charCodeAt(itemRiskIndex * 13 + 7), 1, e2, false);
         risks.lambda = this.decodeRiskNumber(itemRisks.charCodeAt(itemRiskIndex * 13 + 8), itemRisks.charCodeAt(itemRiskIndex * 13 + 9), itemRisks.charCodeAt(itemRiskIndex * 13 + 10), itemRisks.charCodeAt(itemRiskIndex * 13 + 11), sign, e3, true);
-
-        console.log('risks 493')
-        console.log(risks);
       }
     }
   }
@@ -699,14 +708,11 @@ DEEPCore.prototype.getChoiceText = function(choiceSet) {
 }
 
 /**
- * Deconstructs the DEEP system when the question max has been reached.
- * Converts the data to JSON and calls the platform to finish.
- * The platform will destroy the DEEP system and return the data
- * into the platform's data entry field.
+ * Converts the data into JSON and returns it.
+ * @return {String} The JSON string for the data.
  */
-DEEPCore.prototype.finish = function() {
-  // Call the platform and tell it to put in the JSON and destroy DEEP
-  this.platform.finish(JSON.stringify(this.data));
+DEEPCore.prototype.getJSON = function() {
+  return JSON.stringify(this.data);
 }
 
 /**

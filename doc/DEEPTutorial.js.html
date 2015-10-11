@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: DEEPTutorial.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: DEEPTutorial.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// ==========================================
+// ============== DEEPTutorial ==============
+// ==========================================
+
+/**
+ * DEEPTutorial is the system that controls the initial tutorial, i.e. the
+ * introduction and the warmup exercise that the user goes through before
+ * starting DEEP. DEEPTutorial manages mostly its own HTML/CSS, and does the
+ * flow logic and validates the warmup exercise answers to check for
+ * correctness, and also handles error messages. It holds the HTML templates
+ * for the introduction and warmup exercise for DEEP Time and DEEP Risk,
+ * and checks answers against the correct answers, hard-coded in this class.
+ * Once the tutorial is over, it executes finishCallback() which calls back
+ * to the caller's finish function (the platform's beginDEEP() function).
+ * &lt;p>
+ * DEEPTutorial piggybacks off of some CSS provided by the platform's CSS,
+ * .DEEP-choice-label, .DEEP-choice-input, and .DEEP-next-button. This way,
+ * DEEPTutorial can reduce code duplication. The platform must have these
+ * fields styled. All other CSS is provided by DEEPTutorial.
+ * &lt;p>
+ * Lifecycle: Called by the platform, initializes boilerplate HTML, injects
+ * CSS, initializes introduction, waits for user to click Continue, renders
+ * the warmup exercise and attaches click handlers, waits for user response,
+ * validates answers and shows error messages, and finally calls the method
+ * that the platform (that originally called DEEPTutorial) specified as the
+ * callback to execute when finished.
+ * @param {String} DEEPType         The type of DEEP, either TIME or RISK.
+ * @param {Function} finishCallback The function to execute when finished
+ *                                  with the tutorial; usually the platform's
+ *                                  beginDEEP() function.
+ * @constructor
+ */
+var DEEPTutorial = function(DEEPType, finishCallback) {
+  // Set the DEEP Type and the completion callback
+  this.DEEPType = DEEPType;
+  this.finishCallback = finishCallback;
+}
+
+/**
+ * Begins the tutorial process. Injects CSS, adds boilerplate HTML, and adds
+ * the HTML for the intro for the current DEEP type.
+ */
+DEEPTutorial.prototype.begin = function() {
+  var self = this;
+
+  // Inject CSS
+  jQuery('head').append('&lt;style>' + this.CSS.bootstrap + '&lt;/style>');
+
+  // Inject tutorial boilerplate inside the .DEEP-block
+  jQuery('.DEEP-block').append(this.HTML.bootstrap);
+
+  // Inject HTML of the introduction for the corresponding DEEP type
+  jQuery('.DEEP-tutorial').html(this.HTML[this.DEEPType.toLowerCase()].introduction);
+
+  // Add click handler to hook up the submit button to the showWarmup() function
+  jQuery('#DEEP-tutorial-introduction-button').click(function(){
+    self.showWarmup();
+  });
+}
+
+/**
+ * Shows the warmup exercise and attaches the click handlers for the radio
+ * select buttons and the submit button.
+ */
+DEEPTutorial.prototype.showWarmup = function() {
+  var self = this;
+
+  // Inject warmup HTML, replacing introduction HTML
+  jQuery('.DEEP-tutorial').html(this.HTML[this.DEEPType.toLowerCase()].warmup);
+
+  // Attach click handler to radio buttons
+  jQuery('.DEEP-tutorial-question .DEEP-choice-input').click(function(el) {
+    // Get the ID for the clicked element
+    var choiceID = jQuery(this).attr('id');
+
+    // Remove selected class from all choice labels in this element's parent (the question block)
+    jQuery(this).parent().find('.DEEP-choice-label').removeClass('DEEP-choice-label-selected');
+
+    // Find the label that set its "for" to this elemetn's ID and add the selected class
+    jQuery('label[for="' + choiceID + '"]').addClass('DEEP-choice-label-selected');
+  });
+
+  // Add click hook to the next button to submit the warmup
+  jQuery('#DEEP-tutorial-warmup-button').click(function(el) {
+    self.submitWarmup();
+  });
+}
+
+/**
+ * Submits the warmup exercise. First validates the answers to make sure they
+ * are correct, and if so, calls the completion callback given by the caller.
+ */
+DEEPTutorial.prototype.submitWarmup = function() {
+  // Validate warmup
+  if (this.validateWarmup()) {
+    // Warmup validated, destroy the tutorial UI
+    jQuery('.DEEP-tutorial').remove();
+
+    // Call the callback for continuing DEEP
+    this.finishCallback();
+  }
+}
+
+/**
+ * Validates the answers given in the warmup exercise. Checks answers against
+ * the warmupAnswers array for DEEP Time or DEEP Risk, which contains the
+ * correct answers ordered by the question index. Shows an error message and
+ * returns false if there are errors; returns true if all answers match up.
+ * @return {Boolean} Returns true if all answers are correct.
+ */
+DEEPTutorial.prototype.validateWarmup = function() {
+  var validated = true;
+
+  // Get the set of answers (an array)
+  var answerSet = this.warmupAnswers[this.DEEPType.toLowerCase()];
+
+  // Next, clear out all existing errors
+  jQuery('.DEEP-tutorial-question-error').removeClass('DEEP-tutorial-question-error');
+  jQuery('.DEEP-tutorial-error').remove();
+
+  // Iterate through each question and check its value
+  for (var i = 0; i &lt; answerSet.length; i++) {
+    // Get the answer value at this index
+    var answerValue = jQuery('input[type="radio"][name="DEEP-tutorial-' + i + '-choice-selector"]:checked');
+
+    // Check if it's null or if not, if it's the wrong value
+    if (answerValue === null || (answerValue != null &amp;&amp; answerSet[i] != answerValue.val())) {
+      // Get the ID of the parent element and add the error class
+      jQuery('#DEEP-tutorial-question-' + i).addClass('DEEP-tutorial-question-error');
+
+      // Before that element, add the error message
+      jQuery('#DEEP-tutorial-question-' + i).before('&lt;div class="DEEP-tutorial-error">Please answer this question.&lt;/div>');
+
+      // Set error flag
+      validated = false;
+    }
+  }
+
+  return validated;
+}
+
+/**
+ * Contains the answers for the warmup exercises for the DEEP types.
+ * @type {Object}
+ */
+DEEPTutorial.prototype.warmupAnswers = {};
+
+/**
+ * Contains the answers for the warmup exercise for DEEP Time.
+ * @type {Array}
+ */
+DEEPTutorial.prototype.warmupAnswers.time = ["30", "0", "20"];
+
+/**
+ * Contains the answers for the warmup exercise for DEEP Risk.
+ * @type {Array}
+ */
+DEEPTutorial.prototype.warmupAnswers.risk = ["20", "true", "90", "-1"];
+
+/**
+ * Helper method that returns whether the current DEEP
+ * variant is DEEP Time or not.
+ * @return {Boolean} true if the current DEEP variant is DEEP Time; false if not.
+ */
+DEEPCore.prototype.isDEEPTime = function() {
+  return this.DEEPType == "TIME";
+}
+
+/**
+ * Helper method that returns whether the current DEEP
+ * variant is DEEP Risk or not.
+ * @return {Boolean} true if the current DEEP variant is DEEP Risk; false if not.
+ */
+DEEPCore.prototype.isDEEPRisk = function() {
+  return this.DEEPType == "RISK";
+}
+
+/**
+ * Stores boilerplate HTML code.
+ * @type {Object}
+ */
+DEEPTutorial.prototype.HTML = {};
+
+/**
+ * Stores HTML code for the framework around the tutorial.
+ * @type {String}
+ */
+DEEPTutorial.prototype.HTML.bootstrap =  '&lt;div class="DEEP-tutorial">&lt;/div>';
+
+/**
+ * Stores boilerplate HTML code for DEEP Time.
+ * @type {String}
+ */
+DEEPTutorial.prototype.HTML.time = {};
+
+/**
+ * Stores HTML for DEEP Time's introduction.
+ * @type {String}
+ */
+DEEPTutorial.prototype.HTML.time.introduction =  '&lt;p>You will now be presented with a series of questions about your time preferences.  Each question consists of options to compare.  All options are about receiving a certain amount at a specific time.  For example, an option could be: "Receive $10 in 3 days," while another option could be: "Receive $5 today."&lt;/p>\
+                                                  &lt;p>Please click below to get started.&lt;/p>\
+                                                  &lt;div class="DEEP-buttons">\
+                                                    &lt;input type="button" class="DEEP-next-button" id="DEEP-tutorial-introduction-button" value="Continue">\
+                                                  &lt;/div>';
+
+/**
+ * Stores HTML for DEEP Time's warmup exercise.
+ * @type {String}
+ */
+DEEPTutorial.prototype.HTML.time.warmup =  '&lt;h2>Warm Up Questions&lt;/h2>\
+                                            &lt;div class="DEEP-tutorial-content">\
+                                              &lt;p>To make sure that you understand your task, we would like to ask you a few simple preliminary questions before we get started. You will continue with the survey only if you respond correctly to these questions.&lt;/p>\
+                                              &lt;p>Consider the following choice:&lt;/p>\
+                                              &lt;table border="0" class="DEEP-tutorial-warmup-table">\
+                                                &lt;tr>\
+                                                  &lt;td class="DEEP-tutorial-warmup-table-header">Option A&lt;/td>\
+                                                  &lt;td class="DEEP-tutorial-warmup-table-header">Option B&lt;/td>\
+                                                &lt;/tr>\
+                                                &lt;tr>\
+                                                  &lt;td class="DEEP-tutorial-warmup-table-content">Receive &lt;strong>$30 in 3 months&lt;/strong>&lt;/td>\
+                                                  &lt;td class="DEEP-tutorial-warmup-table-content">Receive &lt;strong>$5 today&lt;/strong>&lt;/td>\
+                                                &lt;/tr>\
+                                              &lt;/table>\
+                                            &lt;/div>\
+                                            &lt;div class="DEEP-tutorial-question" id="DEEP-tutorial-question-0">\
+                                              &lt;p>1. Which of the following is the most you could receive?&lt;/p>\
+                                              &lt;label for="DEEP-tutorial-0-choice-1" class="DEEP-choice-label" id="DEEP-choice-0-label-1">$20&lt;/label>\
+                                              &lt;label for="DEEP-tutorial-0-choice-2" class="DEEP-choice-label" id="DEEP-choice-0-label-2">$5&lt;/label>\
+                                              &lt;label for="DEEP-tutorial-0-choice-3" class="DEEP-choice-label" id="DEEP-choice-0-label-3">$30&lt;/label>\
+                                              &lt;label for="DEEP-tutorial-0-choice-4" class="DEEP-choice-label" id="DEEP-choice-0-label-4">$0&lt;/label>\
+                                              &lt;input type="radio" name="DEEP-tutorial-0-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-0-choice-1" value="20">\
+                                              &lt;input type="radio" name="DEEP-tutorial-0-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-0-choice-2" value="5">\
+                                              &lt;input type="radio" name="DEEP-tutorial-0-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-0-choice-3" value="30">\
+                                              &lt;input type="radio" name="DEEP-tutorial-0-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-0-choice-4" value="0">\
+                                            &lt;/div>\
+                                            &lt;div class="DEEP-tutorial-question" id="DEEP-tutorial-question-1">\
+                                              &lt;p>2. Which of the following options is more attractive financially?&lt;/p>\
+                                              &lt;label for="DEEP-tutorial-1-choice-1" class="DEEP-choice-label" id="DEEP-choice-1-label-1">Receive &lt;strong>$10 in 2 weeks&lt;/strong>&lt;/label>\
+                                              &lt;label for="DEEP-tutorial-1-choice-2" class="DEEP-choice-label" id="DEEP-choice-1-label-2">Receive &lt;strong>$10 today&lt;/strong>&lt;/label>\
+                                              &lt;input type="radio" name="DEEP-tutorial-1-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-1-choice-1" value="14">\
+                                              &lt;input type="radio" name="DEEP-tutorial-1-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-1-choice-2" value="0">\
+                                            &lt;/div>\
+                                            &lt;div class="DEEP-tutorial-question" id="DEEP-tutorial-question-2">\
+                                              &lt;p>3. Which of the following options is more attractive financially?&lt;/p>\
+                                              &lt;label for="DEEP-tutorial-2-choice-1" class="DEEP-choice-label" id="DEEP-choice-2-label-1">Receive &lt;strong>$10 in 2 weeks&lt;/strong>&lt;/label>\
+                                              &lt;label for="DEEP-tutorial-2-choice-2" class="DEEP-choice-label" id="DEEP-choice-2-label-2">Receive &lt;strong>$20 in 2 weeks&lt;/strong>&lt;/label>\
+                                              &lt;input type="radio" name="DEEP-tutorial-2-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-2-choice-1" value="10">\
+                                              &lt;input type="radio" name="DEEP-tutorial-2-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-2-choice-2" value="20">\
+                                            &lt;/div>\
+                                            &lt;div class="DEEP-buttons">\
+                                              &lt;input type="button" class="DEEP-next-button" id="DEEP-tutorial-warmup-button" value="Submit">\
+                                            &lt;/div>';
+
+/**
+ * Stores boilerplate HTML code for DEEP Risk.
+ * @type {String}
+ */
+DEEPTutorial.prototype.HTML.risk = {};
+
+/**
+ * Stores HTML for DEEP Risk's introduction.
+ * @type {String}
+ */
+DEEPTutorial.prototype.HTML.risk.introduction =  '&lt;p>You will now be presented with a series of questions about gambles.&lt;/p>\
+                                                  &lt;p>&lt;strong>What is a gamble?&lt;/strong>&lt;/p>\
+                                                  &lt;p>Each gamble has two potential outcomes. These outcomes may be gains or losses. Each of these outcomes has some chance (probability) of occurring, between 0% (no chance of occurring) and 100% (certain to occur). One of the outcomes will definitely happen, so the probabilities of the two outcomes add up to 100%.&lt;/p>\
+                                                  &lt;p>For example, one gamble could be:&lt;/p>\
+                                                  &lt;blockquote>50% chance to win $20&lt;br>50% chance to win $5&lt;/blockquote>\
+                                                  &lt;p>The two possible outcomes of this gamble have a 50% chance of occurring, which means that in this gamble you are equally likely to win $20 or to win $5. This is equivalent to the outcome being determined by flipping a coin.&lt;/p>\
+                                                  &lt;p>Another gamble could be:&lt;/p>\
+                                                  &lt;blockquote>30% chance to win $80&lt;br>70% chance to win $20&lt;/blockquote>\
+                                                  &lt;p>The chance to win $20 is higher than the chance to win $80 (70% vs. 30%).&lt;/p>\
+                                                  &lt;p>In both of these examples you can only win money. Other gambles might involve a chance of losing money. For example, another gamble could be:&lt;/p>\
+                                                  &lt;blockquote>10% chance to win $50&lt;br>90% chance to lose $1&lt;/blockquote>\
+                                                  &lt;p>&lt;strong>What will I need to do?&lt;/strong>&lt;/p>\
+                                                  &lt;p>We will ask you a series of questions in which you will make choices between pairs of gambles. In each question, you will indicate which of the two gambles in the pair you would rather play.&lt;/p>\
+                                                  &lt;p>First we want to make sure that you understand the task, by asking you a few questions to make sure.  Please click below to get started.&lt;/p>\
+                                                  &lt;div class="DEEP-buttons">\
+                                                    &lt;input type="button" class="DEEP-next-button" id="DEEP-tutorial-introduction-button" value="Continue">\
+                                                  &lt;/div>';
+
+/**
+ * Stores HTML for DEEP Risk's warmup exercise.
+ * @type {String}
+ */
+DEEPTutorial.prototype.HTML.risk.warmup =  '&lt;h2>Warm Up Questions&lt;/h2>\
+                                            &lt;div class="DEEP-tutorial-content">\
+                                              &lt;p>To make sure that you understand your task, we would like to ask you a few simple preliminary questions before we get started. You will continue with the survey only if you respond correctly to these questions.&lt;/p>\
+                                              &lt;p>Consider the following gamble:&lt;/p>\
+                                              &lt;table border="0" class="DEEP-tutorial-warmup-table">\
+                                                &lt;tr>\
+                                                  &lt;td class="DEEP-tutorial-warmup-table-header">Gamble A&lt;/td>\
+                                                &lt;/tr>\
+                                                &lt;tr>\
+                                                  &lt;td class="DEEP-tutorial-warmup-table-content">\
+                                                    &lt;strong>30%&lt;/strong> Chance to &lt;strong>Win $20&lt;/strong>&lt;br>\
+                                                    &lt;strong>70%&lt;/strong> Chance to &lt;strong>Win $5&lt;/strong>&lt;br>\
+                                                  &lt;/td>\
+                                                &lt;/tr>\
+                                              &lt;/table>\
+                                            &lt;/div>\
+                                            &lt;div class="DEEP-tutorial-question" id="DEEP-tutorial-question-0">\
+                                              &lt;p>1. What is the most money you could win if you played Gamble A?&lt;/p>\
+                                              &lt;label for="DEEP-tutorial-0-choice-1" class="DEEP-choice-label" id="DEEP-choice-0-label-1">$20&lt;/label>\
+                                              &lt;label for="DEEP-tutorial-0-choice-2" class="DEEP-choice-label" id="DEEP-choice-0-label-2">$5&lt;/label>\
+                                              &lt;label for="DEEP-tutorial-0-choice-3" class="DEEP-choice-label" id="DEEP-choice-0-label-3">$50&lt;/label>\
+                                              &lt;label for="DEEP-tutorial-0-choice-4" class="DEEP-choice-label" id="DEEP-choice-0-label-4">I would lose $1&lt;/label>\
+                                              &lt;input type="radio" name="DEEP-tutorial-0-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-0-choice-1" value="20">\
+                                              &lt;input type="radio" name="DEEP-tutorial-0-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-0-choice-2" value="5">\
+                                              &lt;input type="radio" name="DEEP-tutorial-0-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-0-choice-3" value="50">\
+                                              &lt;input type="radio" name="DEEP-tutorial-0-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-0-choice-4" value="-1">\
+                                            &lt;/div>\
+                                            &lt;div class="DEEP-tutorial-question" id="DEEP-tutorial-question-1">\
+                                              &lt;p>2. Is the following statement true or false? "If I played Gamble A, I would make at least $5."&lt;/p>\
+                                              &lt;label for="DEEP-tutorial-1-choice-1" class="DEEP-choice-label" id="DEEP-choice-1-label-1">True&lt;/label>\
+                                              &lt;label for="DEEP-tutorial-1-choice-2" class="DEEP-choice-label" id="DEEP-choice-1-label-2">False&lt;/label>\
+                                              &lt;input type="radio" name="DEEP-tutorial-1-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-1-choice-1" value="true">\
+                                              &lt;input type="radio" name="DEEP-tutorial-1-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-1-choice-2" value="false">\
+                                            &lt;/div>\
+                                            &lt;div class="DEEP-tutorial-content">\
+                                              &lt;p>Now consider the following gamble.&lt;/p>\
+                                              &lt;table border="0" class="DEEP-tutorial-warmup-table">\
+                                                &lt;tr>\
+                                                  &lt;td class="DEEP-tutorial-warmup-table-header">Gamble B&lt;/td>\
+                                                &lt;/tr>\
+                                                &lt;tr>\
+                                                  &lt;td class="DEEP-tutorial-warmup-table-content">\
+                                                    &lt;strong>10%&lt;/strong> Chance to &lt;strong>Win $50&lt;/strong>&lt;br>\
+                                                    &lt;strong>90%&lt;/strong> Chance to &lt;strong>Lose $1&lt;/strong>&lt;br>\
+                                                  &lt;/td>\
+                                                &lt;/tr>\
+                                              &lt;/table>\
+                                            &lt;/div>\
+                                            &lt;div class="DEEP-tutorial-question" id="DEEP-tutorial-question-2">\
+                                              &lt;p>3. What is the chance that you would lose money playing Gamble B?&lt;/p>\
+                                              &lt;label for="DEEP-tutorial-2-choice-1" class="DEEP-choice-label" id="DEEP-choice-2-label-1">30%&lt;/label>\
+                                              &lt;label for="DEEP-tutorial-2-choice-2" class="DEEP-choice-label" id="DEEP-choice-2-label-2">70%&lt;/label>\
+                                              &lt;label for="DEEP-tutorial-2-choice-3" class="DEEP-choice-label" id="DEEP-choice-2-label-3">90%&lt;/label>\
+                                              &lt;label for="DEEP-tutorial-2-choice-4" class="DEEP-choice-label" id="DEEP-choice-2-label-4">10%&lt;/label>\
+                                              &lt;input type="radio" name="DEEP-tutorial-2-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-2-choice-1" value="30">\
+                                              &lt;input type="radio" name="DEEP-tutorial-2-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-2-choice-2" value="70">\
+                                              &lt;input type="radio" name="DEEP-tutorial-2-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-2-choice-3" value="90">\
+                                              &lt;input type="radio" name="DEEP-tutorial-2-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-2-choice-4" value="10">\
+                                            &lt;/div>\
+                                            &lt;div class="DEEP-tutorial-question" id="DEEP-tutorial-question-3">\
+                                              &lt;p>4. What is the most &lt;strong>likely&lt;/strong> outcome in Gamble B?&lt;/p>\
+                                              &lt;label for="DEEP-tutorial-3-choice-1" class="DEEP-choice-label" id="DEEP-choice-3-label-1">Winning $50&lt;/label>\
+                                              &lt;label for="DEEP-tutorial-3-choice-2" class="DEEP-choice-label" id="DEEP-choice-3-label-2">Winning $1&lt;/label>\
+                                              &lt;label for="DEEP-tutorial-3-choice-3" class="DEEP-choice-label" id="DEEP-choice-3-label-3">Losing $1&lt;/label>\
+                                              &lt;input type="radio" name="DEEP-tutorial-3-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-3-choice-1" value="50">\
+                                              &lt;input type="radio" name="DEEP-tutorial-3-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-3-choice-2" value="1">\
+                                              &lt;input type="radio" name="DEEP-tutorial-3-choice-selector" class="DEEP-choice-input" id="DEEP-tutorial-3-choice-3" value="-1">\
+                                            &lt;/div>\
+                                            &lt;div class="DEEP-buttons">\
+                                              &lt;input type="button" class="DEEP-next-button" id="DEEP-tutorial-warmup-button" value="Submit">\
+                                            &lt;/div>';
+
+/**
+ * Stores boilerplate CSS code.
+ * @type {Object}
+ */
+DEEPTutorial.prototype.CSS = {};
+
+/**
+ * The standard CSS used when setting up the tutorial.
+ * @type {String}
+ */
+DEEPTutorial.prototype.CSS.bootstrap = '.DEEP-tutorial {\
+                                        }\
+                                        \
+                                        .DEEP-tutorial p {\
+                                          margin-bottom: 20px;\
+                                        }\
+                                        \
+                                        .DEEP-tutorial h2 {\
+                                          margin: 20px;\
+                                        }\
+                                        \
+                                        .DEEP-tutorial blockquote {\
+                                          margin-bottom: 20px;\
+                                          margin-left: 20px;\
+                                        }\
+                                        \
+                                        .DEEP-tutorial-content {\
+                                          margin: 0 20px;\
+                                        }\
+                                        \
+                                        .DEEP-tutorial-error {\
+                                          padding: 10px;\
+                                          color: #ff0000;\
+                                          text-align: center;\
+                                        }\
+                                        \
+                                        .DEEP-tutorial-question {\
+                                          margin-bottom: 20px;\
+                                          padding: 20px;\
+                                        }\
+                                        \
+                                        .DEEP-tutorial-question .DEEP-choice-label {\
+                                          margin-bottom: 10px;\
+                                          text-align: left;\
+                                          padding: 15px;\
+                                        }\
+                                        \
+                                        .DEEP-tutorial-question-error {\
+                                          background-color: #e5efff;\
+                                        }\
+                                        \
+                                        .DEEP-tutorial-warmup-table {\
+                                          margin-bottom: 20px;\
+                                        }\
+                                        \
+                                        .DEEP-tutorial-warmup-table-header {\
+                                          background-color: #93BC0D;\
+                                          color: #fff;\
+                                          padding: 10px;\
+                                        }\
+                                        \
+                                        .DEEP-tutorial-warmup-table-content {\
+                                          background-color: #F0F0F0;\
+                                          padding: 10px;\
+                                        }'</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DEEPCore.html">DEEPCore</a></li><li><a href="DEEPQualtrics.html">DEEPQualtrics</a></li><li><a href="DEEPTutorial.html">DEEPTutorial</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Sun Oct 11 2015 17:35:59 GMT-0400 (EDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

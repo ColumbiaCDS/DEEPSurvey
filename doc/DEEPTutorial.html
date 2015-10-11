@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: DEEPTutorial</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: DEEPTutorial</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        DEEPTutorial
+        </h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+
+    <h4 class="name" id="DEEPTutorial"><span class="type-signature"></span>new DEEPTutorial<span class="signature">(DEEPType, finishCallback)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    DEEPTutorial is the system that controls the initial tutorial, i.e. the
+introduction and the warmup exercise that the user goes through before
+starting DEEP. DEEPTutorial manages mostly its own HTML/CSS, and does the
+flow logic and validates the warmup exercise answers to check for
+correctness, and also handles error messages. It holds the HTML templates
+for the introduction and warmup exercise for DEEP Time and DEEP Risk,
+and checks answers against the correct answers, hard-coded in this class.
+Once the tutorial is over, it executes finishCallback() which calls back
+to the caller's finish function (the platform's beginDEEP() function).
+<p>
+DEEPTutorial piggybacks off of some CSS provided by the platform's CSS,
+.DEEP-choice-label, .DEEP-choice-input, and .DEEP-next-button. This way,
+DEEPTutorial can reduce code duplication. The platform must have these
+fields styled. All other CSS is provided by DEEPTutorial.
+<p>
+Lifecycle: Called by the platform, initializes boilerplate HTML, injects
+CSS, initializes introduction, waits for user to click Continue, renders
+the warmup exercise and attaches click handlers, waits for user response,
+validates answers and shows error messages, and finally calls the method
+that the platform (that originally called DEEPTutorial) specified as the
+callback to execute when finished.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>DEEPType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The type of DEEP, either TIME or RISK.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>finishCallback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The function to execute when finished
+                                 with the tutorial; usually the platform's
+                                 beginDEEP() function.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="DEEPTutorial.js.html">DEEPTutorial.js</a>, <a href="DEEPTutorial.js.html#line33">line 33</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="CSS"><span class="type-signature"></span>CSS<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    Stores boilerplate CSS code.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="DEEPTutorial.js.html">DEEPTutorial.js</a>, <a href="DEEPTutorial.js.html#line362">line 362</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="HTML"><span class="type-signature"></span>HTML<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    Stores boilerplate HTML code.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="DEEPTutorial.js.html">DEEPTutorial.js</a>, <a href="DEEPTutorial.js.html#line182">line 182</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="warmupAnswers"><span class="type-signature"></span>warmupAnswers<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    Contains the answers for the warmup exercises for the DEEP types.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="DEEPTutorial.js.html">DEEPTutorial.js</a>, <a href="DEEPTutorial.js.html#line146">line 146</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="begin"><span class="type-signature"></span>begin<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Begins the tutorial process. Injects CSS, adds boilerplate HTML, and adds
+the HTML for the intro for the current DEEP type.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="DEEPTutorial.js.html">DEEPTutorial.js</a>, <a href="DEEPTutorial.js.html#line43">line 43</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="showWarmup"><span class="type-signature"></span>showWarmup<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Shows the warmup exercise and attaches the click handlers for the radio
+select buttons and the submit button.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="DEEPTutorial.js.html">DEEPTutorial.js</a>, <a href="DEEPTutorial.js.html#line65">line 65</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="submitWarmup"><span class="type-signature"></span>submitWarmup<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    Submits the warmup exercise. First validates the answers to make sure they
+are correct, and if so, calls the completion callback given by the caller.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="DEEPTutorial.js.html">DEEPTutorial.js</a>, <a href="DEEPTutorial.js.html#line93">line 93</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="validateWarmup"><span class="type-signature"></span>validateWarmup<span class="signature">()</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Validates the answers given in the warmup exercise. Checks answers against
+the warmupAnswers array for DEEP Time or DEEP Risk, which contains the
+correct answers ordered by the question index. Shows an error message and
+returns false if there are errors; returns true if all answers match up.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="DEEPTutorial.js.html">DEEPTutorial.js</a>, <a href="DEEPTutorial.js.html#line111">line 111</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns true if all answers are correct.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DEEPCore.html">DEEPCore</a></li><li><a href="DEEPQualtrics.html">DEEPQualtrics</a></li><li><a href="DEEPTutorial.html">DEEPTutorial</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Sun Oct 11 2015 17:35:59 GMT-0400 (EDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

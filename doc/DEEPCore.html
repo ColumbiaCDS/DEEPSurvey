@@ -42,7 +42,7 @@
 
     
 
-    <h4 class="name" id="DEEPCore"><span class="type-signature"></span>new DEEPCore<span class="signature">(platform, questionCount)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="DEEPCore"><span class="type-signature"></span>new DEEPCore<span class="signature">(DEEPType, questionCount)</span><span class="type-signature"></span></h4>
 
     
 
@@ -53,8 +53,8 @@
 questionCount given is valid, and then sets up variables.
 DEEPCore includes all of the core logic for DEEP, including
 data storage, question generation, and the user flow.
-DEEPCore invokes the platform, which handles the UI, when
-UI needs to be updated.
+The platform that calls DEEPCore asks for data and updates
+their UI based on their own rules.
 </div>
 
 
@@ -90,13 +90,13 @@ UI needs to be updated.
 
         <tr>
             
-                <td class="name"><code>platform</code></td>
+                <td class="name"><code>DEEPType</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">String</span>
 
 
             
@@ -106,8 +106,7 @@ UI needs to be updated.
 
             
 
-            <td class="description last">The reference to the object containing
-                               the platform methods (Qualtrics/LimeSurvey).</td>
+            <td class="description last">The DEEP type to load, either RISK or TIME.</td>
         </tr>
 
     
@@ -171,7 +170,7 @@ UI needs to be updated.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line17">line 17</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line16">line 16</a>
     </li></ul></dd>
     
 
@@ -271,7 +270,7 @@ outcome0Chance, outcome0Amount, outcome1Chance, outcome1Amount.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line91">line 91</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line93">line 93</a>
     </li></ul></dd>
     
 
@@ -345,7 +344,7 @@ outcome0Chance, outcome0Amount, outcome1Chance, outcome1Amount.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line99">line 99</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line101">line 101</a>
     </li></ul></dd>
     
 
@@ -417,7 +416,7 @@ outcome0Chance, outcome0Amount, outcome1Chance, outcome1Amount.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line75">line 75</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line77">line 77</a>
     </li></ul></dd>
     
 
@@ -497,7 +496,7 @@ Structure:
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line61">line 61</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line63">line 63</a>
     </li></ul></dd>
     
 
@@ -570,7 +569,7 @@ This stores a state that is used in many places in the class.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line47">line 47</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line49">line 49</a>
     </li></ul></dd>
     
 
@@ -643,7 +642,7 @@ If not, renderChoices() will use fixed values for starting off.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line69">line 69</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line71">line 71</a>
     </li></ul></dd>
     
 
@@ -717,7 +716,7 @@ path. Used in calculating the next question.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line83">line 83</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line85">line 85</a>
     </li></ul></dd>
     
 
@@ -789,7 +788,7 @@ path. Used in calculating the next question.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line109">line 109</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line111">line 111</a>
     </li></ul></dd>
     
 
@@ -816,7 +815,7 @@ path. Used in calculating the next question.
 
     
 
-    <h4 class="name" id="beginDEEP"><span class="type-signature"></span>beginDEEP<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="beginDEEP"><span class="type-signature"></span>beginDEEP<span class="signature">()</span><span class="type-signature"> &rarr; {Array}</span></h4>
 
     
 
@@ -824,10 +823,10 @@ path. Used in calculating the next question.
 
 <div class="description">
     Begin the initialization of DEEP. First sets the initial
-values of the data for step 1, and then passes execution 
-to renderChoices(), which will recognize that the system
-has not been initialized and will use hard-coded initial
-values to set up the system.
+values of the data for step 1, and then returns the choice
+text by calling renderChoices(), which will recognize that
+the system has not been initialized and will use hard-coded
+initial values to set up the system and get the first choices.
 </div>
 
 
@@ -871,7 +870,7 @@ values to set up the system.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line275">line 275</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line278">line 278</a>
     </li></ul></dd>
     
 
@@ -894,6 +893,28 @@ values to set up the system.
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an array with the first two choices.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -1005,7 +1026,7 @@ Ported from Legacy Qualtrics DEEP.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line537">line 537</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line552">line 552</a>
     </li></ul></dd>
     
 
@@ -1300,7 +1321,7 @@ I don't really know how this works, either.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line574">line 574</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line589">line 589</a>
     </li></ul></dd>
     
 
@@ -1345,91 +1366,6 @@ I don't really know how this works, either.
 </dl>
 
     
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="finish"><span class="type-signature"></span>finish<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    Deconstructs the DEEP system when the question max has been reached.
-Converts the data to JSON and calls the platform to finish.
-The platform will destroy the DEEP system and return the data
-into the platform's data entry field.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line707">line 707</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1589,12 +1525,19 @@ the integer of the array index.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line476">line 476</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line487">line 487</a>
     </li></ul></dd>
     
 
     
 
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="DEEPCore.html#renderChoices">DEEPCore#renderChoices</a></li>
+        </ul>
+    </dd>
     
 
     
@@ -1772,12 +1715,19 @@ on whether it is for DEEP Time or DEEP Risk.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line509">line 509</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line521">line 521</a>
     </li></ul></dd>
     
 
     
 
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="DEEPCore.html#renderChoices">DEEPCore#renderChoices</a></li>
+        </ul>
+    </dd>
     
 
     
@@ -1932,7 +1882,7 @@ meant to be put in the button that allows them to select a choice.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line683">line 683</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line692">line 692</a>
     </li></ul></dd>
     
 
@@ -2038,7 +1988,7 @@ process.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line352">line 352</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line358">line 358</a>
     </li></ul></dd>
     
 
@@ -2200,7 +2150,7 @@ Ported from Legacy Qualtrics DEEP.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line652">line 652</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line661">line 661</a>
     </li></ul></dd>
     
 
@@ -2239,6 +2189,110 @@ Ported from Legacy Qualtrics DEEP.
     <dd>
         
 <span class="param-type">Integer</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getJSON"><span class="type-signature"></span>getJSON<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Converts the data into JSON and returns it.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line714">line 714</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The JSON string for the data.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
 
 
     </dd>
@@ -2381,7 +2435,7 @@ Ported from Legacy Qualtrics DEEP.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line596">line 596</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line611">line 611</a>
     </li></ul></dd>
     
 
@@ -2487,7 +2541,112 @@ variant is DEEP Risk or not.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line726">line 726</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line732">line 732</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    true if the current DEEP variant is DEEP Risk; false if not.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="isDEEPRisk"><span class="type-signature"></span>isDEEPRisk<span class="signature">()</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Helper method that returns whether the current DEEP
+variant is DEEP Risk or not.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="DEEPTutorial.js.html">DEEPTutorial.js</a>, <a href="DEEPTutorial.js.html#line174">line 174</a>
     </li></ul></dd>
     
 
@@ -2592,7 +2751,7 @@ variant is DEEP Time or not.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line717">line 717</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line723">line 723</a>
     </li></ul></dd>
     
 
@@ -2645,16 +2804,15 @@ variant is DEEP Time or not.
 
     
 
-    <h4 class="name" id="nextQuestion"><span class="type-signature"></span>nextQuestion<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="isDEEPTime"><span class="type-signature"></span>isDEEPTime<span class="signature">()</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
 
     
 
 
 
 <div class="description">
-    Get the next question. Checks whether the question maximum has
-been reached; if so, invokes finish; if not, increases the
-current step and invokes renderChoices().
+    Helper method that returns whether the current DEEP
+variant is DEEP Time or not.
 </div>
 
 
@@ -2698,7 +2856,7 @@ current step and invokes renderChoices().
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line377">line 377</a>
+        <a href="DEEPTutorial.js.html">DEEPTutorial.js</a>, <a href="DEEPTutorial.js.html#line165">line 165</a>
     </li></ul></dd>
     
 
@@ -2721,6 +2879,28 @@ current step and invokes renderChoices().
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    true if the current DEEP variant is DEEP Time; false if not.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -2729,7 +2909,115 @@ current step and invokes renderChoices().
 
     
 
-    <h4 class="name" id="renderChoices"><span class="type-signature"></span>renderChoices<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="nextQuestion"><span class="type-signature"></span>nextQuestion<span class="signature">()</span><span class="type-signature"> &rarr; {Array}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Get the next question. Checks whether the question maximum has
+been reached; if so, invokes finish; if not, increases the
+current step and returns the choice text from renderChoices().
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line386">line 386</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Returns an array of the choices for the next
+                question, or false if the maximum number of
+                questions has been reached.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="renderChoices"><span class="type-signature"></span>renderChoices<span class="signature">()</span><span class="type-signature"> &rarr; {Array}</span></h4>
 
     
 
@@ -2774,8 +3062,8 @@ Finally, index in hand, we can then look up that
 index in the codedChoices0 and codedChoices1 to
 find the corresponding choice to show. Whew!
 <p>
-Once we save the choice text, then we ask the
-platform to update the choices.
+Once we save the choice text, then we return the
+array of the choice text.
 </div>
 
 
@@ -2819,12 +3107,21 @@ platform to update the choices.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line431">line 431</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line445">line 445</a>
     </li></ul></dd>
     
 
     
 
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="DEEPCore.html#getChoiceOption">DEEPCore#getChoiceOption</a></li>
+        
+            <li><a href="DEEPCore.html#getChoiceIndex">DEEPCore#getChoiceIndex</a></li>
+        </ul>
+    </dd>
     
 
     
@@ -2842,6 +3139,28 @@ platform to update the choices.
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A two-item array of the text of the choices.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -2953,7 +3272,7 @@ new path, and saves all of that to the data.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line302">line 302</a>
+        <a href="DEEPCore.js.html">DEEPCore.js</a>, <a href="DEEPCore.js.html#line305">line 305</a>
     </li></ul></dd>
     
 
@@ -2995,13 +3314,13 @@ new path, and saves all of that to the data.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DEEPCore.html">DEEPCore</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="DEEPCore.html">DEEPCore</a></li><li><a href="DEEPQualtrics.html">DEEPQualtrics</a></li><li><a href="DEEPTutorial.html">DEEPTutorial</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Sat Oct 10 2015 17:58:20 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Sun Oct 11 2015 17:35:59 GMT-0400 (EDT)
 </footer>
 
 <script> prettyPrint(); </script>

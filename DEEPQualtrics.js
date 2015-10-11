@@ -445,6 +445,8 @@ Qualtrics.SurveyEngine.addOnload(function()
    * Once we save the choice text, then we return the
    * array of the choice text.
    * @return {Array} A two-item array of the text of the choices.
+   * @see {@link DEEPCore#getChoiceOption}
+   * @see {@link DEEPCore#getChoiceIndex}
    */
   DEEPCore.prototype.renderChoices = function() {
     if (this.currentStep == 1 && this.initialized == false) {
@@ -466,9 +468,9 @@ Qualtrics.SurveyEngine.addOnload(function()
     }
 
     // Get the choice text
-    var choiceText    = [];
-    choiceText[0] = this.getChoiceText(this.currentChoice0);
-    choiceText[1] = this.getChoiceText(this.currentChoice1);
+    var choiceText = [];
+    choiceText[0]  = this.getChoiceText(this.currentChoice0);
+    choiceText[1]  = this.getChoiceText(this.currentChoice1);
 
     // Return the choice text
     return choiceText;
@@ -486,6 +488,7 @@ Qualtrics.SurveyEngine.addOnload(function()
    *                             for codedChoices0 or codedChoices1.
    * @return {Integer}           The array index for looking up on
    *                             codedChoices0 or codedChoices1.
+   * @see    {@link DEEPCore#renderChoices}
    */
   DEEPCore.prototype.getChoiceIndex = function(step, path, choiceNum) {
     var choiceCodedIndexer;
@@ -519,6 +522,7 @@ Qualtrics.SurveyEngine.addOnload(function()
    *                               In DEEP Time: amount, time. In DEEP Risk:
    *                               outcome0Chance, outcome0Amount, outcome1Chance,
    *                               outcome1Amount.
+   * @see    {@link DEEPCore#renderChoices}
    */
   DEEPCore.prototype.getChoiceOption = function(optionSet) {
     // Get the choice index
@@ -1167,6 +1171,7 @@ Qualtrics.SurveyEngine.addOnload(function()
    * connects to the Qualtrics survey and acts as the
    * middleman between DEEPCore and the Qualtrics survey.
    * @param {object} qualtricsEngine The Qualtrics engine. When loading inside Qualtrics.SurveyEngine, it is `this`.
+   * @constructor
    */
   var DEEPQualtrics = function(qualtricsEngine) {
     this.qualtricsEngine = qualtricsEngine;
