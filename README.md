@@ -31,7 +31,7 @@ This repository contains:
 		  file for the DEEP LimeSurvey plugin, and it also contains a
 		  CSS file for DEEP in `/src/limesurvey/assets/`. The other
 		  assets, DEEPCore, DEEPTutorial, and DEEPLimeSurvey, are
-		  copied in compile time.
+		  copied at compile time.
 		- Qualtrics: `/src/qualtrics/DEEPforQualtrics.js` contains the
 		  code that you paste into Qualtrics when editing the survey.
 		  During compilation, the compile system includes DEEPCore,
