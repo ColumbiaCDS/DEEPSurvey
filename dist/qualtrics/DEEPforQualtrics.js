@@ -1114,6 +1114,7 @@ Qualtrics.SurveyEngine.addOnload(function()
    * @type {String}
    */
   DEEPTutorial.prototype.CSS.bootstrap = '.DEEP-tutorial {\
+                                            margin: 20px;\
                                           }\
                                           \
                                           .DEEP-tutorial p {\
@@ -1169,6 +1170,7 @@ Qualtrics.SurveyEngine.addOnload(function()
                                             background-color: #F0F0F0 !important;\
                                             padding: 10px !important;\
                                             text-shadow: none !important;\
+                                            color: #111 !important;\
                                           }';
   // ===========================================
   // ============== DEEPQualtrics ==============
@@ -1293,6 +1295,9 @@ Qualtrics.SurveyEngine.addOnload(function()
     // Call beginDEEP, which will return an array of the questions
     var firstQuestion = this.DEEPCore.beginDEEP();
     this.updateChoices(firstQuestion[0], firstQuestion[1]);
+  
+    // Scroll to top
+    window.scrollTo(0, 0);
   }
   
   /**
@@ -1555,11 +1560,11 @@ Qualtrics.SurveyEngine.addOnload(function()
                                               background-color: #f9f9f9;\
                                               border: 1px solid #ccc;\
                                               border-radius: 2px;\
-                                              width: 100%;\
                                               display: block;\
                                               text-align: center;\
                                               transition: background .3s, border .3s;\
                                               text-shadow: none !important;\
+                                              color: #111 !important;\
                                             }\
                                             \
                                             .DEEP-choice-label:hover {\
@@ -1571,7 +1576,7 @@ Qualtrics.SurveyEngine.addOnload(function()
                                             .DEEP-choice-label-selected {\
                                               background-color: #4B86EE;\
                                               border-color: #1351C1;\
-                                              color: #fff;\
+                                              color: #fff !important;\
                                             }\
                                             .DEEP-choice-label-selected:hover {\
                                               background-color: #4B86EE;\

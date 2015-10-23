@@ -121,6 +121,9 @@ DEEPQualtrics.prototype.beginDEEP = function() {
   // Call beginDEEP, which will return an array of the questions
   var firstQuestion = this.DEEPCore.beginDEEP();
   this.updateChoices(firstQuestion[0], firstQuestion[1]);
+
+  // Scroll to top
+  window.scrollTo(0, 0);
 }
 
 /**
@@ -383,11 +386,11 @@ DEEPQualtrics.prototype.CSS.bootstrap =  'div.DEEP-content {\
                                             background-color: #f9f9f9;\
                                             border: 1px solid #ccc;\
                                             border-radius: 2px;\
-                                            width: 100%;\
                                             display: block;\
                                             text-align: center;\
                                             transition: background .3s, border .3s;\
                                             text-shadow: none !important;\
+                                            color: #111 !important;\
                                           }\
                                           \
                                           .DEEP-choice-label:hover {\
@@ -399,7 +402,7 @@ DEEPQualtrics.prototype.CSS.bootstrap =  'div.DEEP-content {\
                                           .DEEP-choice-label-selected {\
                                             background-color: #4B86EE;\
                                             border-color: #1351C1;\
-                                            color: #fff;\
+                                            color: #fff !important;\
                                           }\
                                           .DEEP-choice-label-selected:hover {\
                                             background-color: #4B86EE;\

@@ -113,6 +113,9 @@ DEEPLimeSurvey.prototype.beginDEEP = function() {
   // Call beginDEEP, which will return an array of the questions
   var firstQuestion = this.DEEPCore.beginDEEP();
   this.updateChoices(firstQuestion[0], firstQuestion[1]);
+  
+  // Scroll to top
+  window.scrollTo(0, 0);
 }
 
 /**

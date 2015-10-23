@@ -369,6 +369,7 @@ DEEPTutorial.prototype.CSS = {};
  * @type {String}
  */
 DEEPTutorial.prototype.CSS.bootstrap = '.DEEP-tutorial {\
+                                          margin: 20px;\
                                         }\
                                         \
                                         .DEEP-tutorial p {\
@@ -424,4 +425,5 @@ DEEPTutorial.prototype.CSS.bootstrap = '.DEEP-tutorial {\
                                           background-color: #F0F0F0 !important;\
                                           padding: 10px !important;\
                                           text-shadow: none !important;\
+                                          color: #111 !important;\
                                         }';

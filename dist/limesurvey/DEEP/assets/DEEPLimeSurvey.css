@@ -14,6 +14,11 @@ div.DEEP-error {
 
 table.DEEP-choice-table {
   width: 100%;
+  border: 0 !important;
+}
+
+table.DEEP-choice-table td {
+  border: 0 !important;
 }
 
 table.DEEP-choice-table.DEEP-choice-table-error {
@@ -25,11 +30,11 @@ table.DEEP-choice-table.DEEP-choice-table-error {
   background-color: #f9f9f9;
   border: 1px solid #ccc;
   border-radius: 2px;
-  width: 100%;
   display: block;
   text-align: center;
   transition: background .3s, border .3s;
   text-shadow: none !important;
+  color: #111 !important;
 }
 
 .DEEP-choice-label:hover {
@@ -41,7 +46,7 @@ table.DEEP-choice-table.DEEP-choice-table-error {
 .DEEP-choice-label-selected {
   background-color: #4B86EE;
   border-color: #1351C1;
-  color: #fff;
+  color: #fff !important;
 }
 
 .DEEP-choice-label-selected:hover {
