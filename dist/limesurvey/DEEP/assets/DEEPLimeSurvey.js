@@ -234,7 +234,7 @@ DEEPLimeSurvey.prototype.finish = function() {
   jQuery('.DEEP-answer').show();
 
   // Apply CSS to the textarea so it won't show up
-  jQuery('.DEEP-answer textarea').css('height','0').css('width','0').css('visibility','hidden').css('overflow','hidden');
+  jQuery('.DEEP-answer textarea').css('height','0').css('width','0').css('position','absolute').css('margin-left','-9999px').css('overflow','hidden');
 
   // Inject JSON into answer field
   jQuery('.DEEP-answer textarea').val(dataJSON);

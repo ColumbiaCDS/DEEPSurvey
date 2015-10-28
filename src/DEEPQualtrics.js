@@ -249,7 +249,7 @@ DEEPQualtrics.prototype.finish = function() {
   jQuery(this.questionContainer).show();
 
   // Apply CSS to this question container so it won't show up
-  jQuery(this.questionContainer).css('height','0').css('width','0').css('visibility','hidden').css('overflow','hidden');
+  jQuery(this.questionContainer).css('height','0').css('width','0').css('position','absolute').css('margin-left','-9999px').css('overflow','hidden');
 
   // Destroy the DEEP UI
   jQuery('#DEEP-question').remove();
@@ -409,7 +409,8 @@ DEEPQualtrics.prototype.CSS.bootstrap =  'div.DEEP-content {\
                                             border-color: #1351C1;\
                                           }\
                                           .DEEP-choice-input {\
-                                            visibility: hidden;\
+                                            position: absolute;\
+                                            margin-left: -9999px;\
                                             height: 0px;\
                                             width: 0px;\
                                           }\
