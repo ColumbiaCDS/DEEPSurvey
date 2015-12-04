@@ -1,6 +1,6 @@
 // DEEPforQualtrics.js is the code for Qualtrics that is meant to be pasted
 // into Qualtrics' JS field.
-// 
+//
 // It includes DEEPCore, DEEPTutorial, and DEEPQualtrics.
 
 Qualtrics.SurveyEngine.addOnload(function()
@@ -36,11 +36,11 @@ Qualtrics.SurveyEngine.addOnload(function()
   // ==================================
   // ============== Init ==============
   // ==================================
-  
-  if (DEEPLoaded) {
+
+  if (window.DEEPLoaded) {
     alert("DEEP cannot be loaded twice on this page.");
   } else {
-    DEEPLoaded = true;
+    window.DEEPLoaded = true;
 
     var DEEP = new DEEPQualtrics(qualtricsEngine);
     DEEP.setup();

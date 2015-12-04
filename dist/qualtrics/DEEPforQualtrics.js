@@ -1,6 +1,6 @@
 // DEEPforQualtrics.js is the code for Qualtrics that is meant to be pasted
 // into Qualtrics' JS field.
-// 
+//
 // It includes DEEPCore, DEEPTutorial, and DEEPQualtrics.
 
 Qualtrics.SurveyEngine.addOnload(function()
@@ -1224,7 +1224,34 @@ Qualtrics.SurveyEngine.addOnload(function()
   
     // Disable and hide the next button
     this.qualtricsEngine.disableNextButton();
+  
+    // Hack for next button delay Qualtrics bug
+    // First, try to hide the buttons
     jQuery('#NextButton').hide();
+    jQuery('#Buttons').hide();
+  
+    // We may have failed to hide the buttons due to
+    // a bug in Qualtrics' page flow animation
+    // So, attempt to hide the buttons every 20 milliseconds
+    // This means that as soon as the button appears on
+    // the screen, we fade it out
+    var buttonHideInterval = setInterval(function() {
+      jQuery('#NextButton').fadeOut('fast');
+      jQuery('#Buttons').fadeOut('fast');
+    }, 20);
+  
+    // After 5 seconds, most likely the button has come on screen
+    // Cancel the buttonHideInterval so it's no longer running
+    setTimeout(function() {
+      clearInterval(buttonHideInterval);
+    }, 5000);
+  
+    setTimeout(function() {
+      jQuery('#NextButton').hide();
+      jQuery('#Buttons').hide();
+      $('NextButton').hide();
+      $('Buttons').hide();
+    }, 200);
   
     // Save the question container reference
     this.questionContainer = this.qualtricsEngine.getQuestionContainer();
@@ -1304,7 +1331,7 @@ Qualtrics.SurveyEngine.addOnload(function()
    * Returns the currently selected choice in the choice set.
    * @return {Number} The ID of the currently selected choice, 1 or 2.
    */
-  DEEPQualtrics.prototype.getSelectedChoice = function() { 
+  DEEPQualtrics.prototype.getSelectedChoice = function() {
     var selectChoice = jQuery("input[type='radio'][name='DEEP-choice-selector']:checked");
     if (selectChoice.length > 0) {
       var choice = parseInt(selectChoice.val());
@@ -1394,7 +1421,7 @@ Qualtrics.SurveyEngine.addOnload(function()
    */
   DEEPQualtrics.prototype.updateChoices = function(choice0, choice1) {
     jQuery('#DEEP-choice-label-0').html(choice0);
-    jQuery('#DEEP-choice-label-1').html(choice1); 
+    jQuery('#DEEP-choice-label-1').html(choice1);
   
     if (this.DEEPCore.isDEEPTime()) {
       // Randomize placement if DEEP Time
@@ -1416,7 +1443,10 @@ Qualtrics.SurveyEngine.addOnload(function()
     this.qualtricsEngine.setChoiceValue('TEXT',dataJSON);
   
     // Unhide and enable the next button
+    jQuery('#Buttons').show();
     jQuery('#NextButton').show();
+    $('Buttons').show();
+    $('NextButton').show();
     this.qualtricsEngine.enableNextButton();
   
     // Show the original question container
@@ -1425,8 +1455,14 @@ Qualtrics.SurveyEngine.addOnload(function()
     // Apply CSS to this question container so it won't show up
     jQuery(this.questionContainer).css('height','0').css('width','0').css('position','absolute').css('margin-left','-9999px').css('overflow','hidden');
   
+    // Add waiting message
+    jQuery('#DEEP-question').after('<p style="margin-top: 30px;">Saving survey. Please wait a moment...</p>');
+  
     // Destroy the DEEP UI
     jQuery('#DEEP-question').remove();
+  
+    // Unset window.DEEPLoaded
+    window.DEEPLoaded = false;
   
     // Advance to the next page
     this.qualtricsEngine.clickNextButton();
@@ -1635,11 +1671,11 @@ Qualtrics.SurveyEngine.addOnload(function()
   // ==================================
   // ============== Init ==============
   // ==================================
-  
-  if (DEEPLoaded) {
+
+  if (window.DEEPLoaded) {
     alert("DEEP cannot be loaded twice on this page.");
   } else {
-    DEEPLoaded = true;
+    window.DEEPLoaded = true;
 
     var DEEP = new DEEPQualtrics(qualtricsEngine);
     DEEP.setup();
