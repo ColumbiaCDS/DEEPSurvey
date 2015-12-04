@@ -71,6 +71,12 @@ DEEPCore.prototype.data[0] = {}; // There is no 'zeroth' question, so set it to 
 DEEPCore.prototype.initialized = false;
 
 /**
+ * Stores the start time for the step for use in calculating response duration.
+ * @type {Date}
+ */
+DEEPCore.prototype.stepStartTime = null;
+
+/**
  * Represents the current step of DEEP the user is on, from 1..questionCount
  * @type {Number}
  */
@@ -291,6 +297,9 @@ DEEPCore.prototype.beginDEEP = function() {
     this.data[this.currentStep].lambda = 2.2
   }
 
+  // Store the step start time
+  this.stepStartTime = Date.now();
+
   // Return the array of the first choices
   return this.renderChoices();
 }
@@ -320,6 +329,9 @@ DEEPCore.prototype.saveChoice = function(choice) {
 
   // Store the current "answer", which is [1,2]
   this.data[this.currentStep].answer = choice + 1;
+
+  // Store the response time
+  this.data[this.currentStep].responseTime = this.getResponseTime();
 
   // Get the new ID
   // Returns the number for the ID up to this point
@@ -376,6 +388,22 @@ DEEPCore.prototype.getCurrentPath = function() {
 }
 
 /**
+ * Calculates the number of seconds since the user started the step, stored in
+ * stepStartTime.
+ * @return {number} The number of seconds since the user started the step.
+ */
+DEEPCore.prototype.getResponseTime = function() {
+  if (this.stepStartTime) {
+    var currentTime = Date.now();
+    var difference = currentTime - this.stepStartTime;
+    var seconds = difference / 1000;
+    return seconds;
+  } else {
+    return 0;
+  }
+}
+
+/**
  * Get the next question. Checks whether the question maximum has
  * been reached; if so, invokes finish; if not, increases the
  * current step and returns the choice text from renderChoices().
@@ -391,6 +419,9 @@ DEEPCore.prototype.nextQuestion = function() {
   } else {
     // Increment current step
     this.currentStep++;
+
+    // Store current time
+    this.stepStartTime = Date.now();
 
     // Render the choices and return the array of choices
     return this.renderChoices();
@@ -489,7 +520,7 @@ DEEPCore.prototype.getChoiceIndex = function(step, path, choiceNum) {
 
   // First, get the ASCII indexer, for which the charcode
   // represents the actual number
-  
+
   if (this.isDEEPTime()) {
     choiceCodedIndexer = this.priors.time.codedIndexers[step].charCodeAt(path * 2 + choiceNum);
   }
@@ -509,7 +540,7 @@ DEEPCore.prototype.getChoiceIndex = function(step, path, choiceNum) {
  * returns an object containing the vaues of that choice, depending
  * on whether it is for DEEP Time or DEEP Risk.
  * @param  {Integer} optionSet   The option set to use, either 0 or 1,
- *                               corresponding to codedChoices0 or codedChoices1. 
+ *                               corresponding to codedChoices0 or codedChoices1.
  * @param  {Integer} choiceIndex The index of the choice in the array for the
  *                               requested choice set.
  * @return {Object}              An object containing the values for the choice.
@@ -555,18 +586,18 @@ DEEPCore.prototype.decodeIndexer = function (letter) {
       return letter - 97 + 26;
     } else {
       return letter - 65;
-    } 
+    }
   }
 
   if (this.isDEEPRisk()) {
-    if (letter >= 97 ) 
+    if (letter >= 97 )
       return letter -97 + 26 ;
-    if (letter >= 65 ) 
+    if (letter >= 65 )
       return letter - 65;
-    if (letter >= 48 ) 
+    if (letter >= 48 )
       return letter -48 + 52;
-    if (letter >= 42 ) 
-      return letter -42 + 62;       
+    if (letter >= 42 )
+      return letter -42 + 62;
     return 0;
   }
 }
@@ -577,13 +608,13 @@ DEEPCore.prototype.decodeIndexer = function (letter) {
  * <p>
  * Ported from Legacy Qualtrics DEEP.
  * I don't really know how this works, either.
- * @param  {String}  s0       
- * @param  {String}  s1       
- * @param  {String}  s2       
- * @param  {String}  s3       
- * @param  {Integer} sign     
- * @param  {Integer} e        
- * @param  {Boolean} isLambda 
+ * @param  {String}  s0
+ * @param  {String}  s1
+ * @param  {String}  s2
+ * @param  {String}  s3
+ * @param  {Integer} sign
+ * @param  {Integer} e
+ * @param  {Boolean} isLambda
  * @return {Number}           The decoded number.
  */
 DEEPCore.prototype.decodeRiskNumber = function MydeCodeNumber(s0, s1, s2, s3, sign, e, isLambda) {

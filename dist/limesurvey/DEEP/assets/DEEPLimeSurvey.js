@@ -246,7 +246,7 @@ DEEPLimeSurvey.prototype.finish = function() {
   jQuery('#DEEP-question').remove();
 
   // Show the completion message
-  jQuery('.DEEP-answer').append('<p>You may now continue the survey.');
+  jQuery('.DEEP-answer').append('<p>You may now continue the survey.</p>');
 }
 
 /**
