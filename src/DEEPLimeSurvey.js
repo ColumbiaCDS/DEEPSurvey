@@ -113,7 +113,7 @@ DEEPLimeSurvey.prototype.beginDEEP = function() {
   // Call beginDEEP, which will return an array of the questions
   var firstQuestion = this.DEEPCore.beginDEEP();
   this.updateChoices(firstQuestion[0], firstQuestion[1]);
-  
+
   // Scroll to top
   window.scrollTo(0, 0);
 }
@@ -122,7 +122,7 @@ DEEPLimeSurvey.prototype.beginDEEP = function() {
  * Returns the currently selected choice in the choice set.
  * @return {Number} The ID of the currently selected choice, 1 or 2.
  */
-DEEPLimeSurvey.prototype.getSelectedChoice = function() { 
+DEEPLimeSurvey.prototype.getSelectedChoice = function() {
   var selectChoice = jQuery("input[type='radio'][name='DEEP-choice-selector']:checked");
   if (selectChoice.length > 0) {
     var choice = parseInt(selectChoice.val());
@@ -212,7 +212,7 @@ DEEPLimeSurvey.prototype.showError = function() {
  */
 DEEPLimeSurvey.prototype.updateChoices = function(choice0, choice1) {
   jQuery('#DEEP-choice-label-0').html(choice0);
-  jQuery('#DEEP-choice-label-1').html(choice1); 
+  jQuery('#DEEP-choice-label-1').html(choice1);
 
   if (this.DEEPCore.isDEEPTime()) {
     // Randomize placement if DEEP Time
@@ -244,6 +244,9 @@ DEEPLimeSurvey.prototype.finish = function() {
 
   // Destroy the DEEP UI
   jQuery('#DEEP-question').remove();
+
+  // Unset window.DEEPLoaded
+  window.DEEPLoaded = false;
 
   // Show the completion message
   jQuery('.DEEP-answer').append('<p>You may now continue the survey.</p>');

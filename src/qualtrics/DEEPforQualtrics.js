@@ -5,7 +5,6 @@
 
 Qualtrics.SurveyEngine.addOnload(function()
 {
-  var DEEPLoaded = false;
   var skipTutorialMode = false;
   var debugMode = true;
 

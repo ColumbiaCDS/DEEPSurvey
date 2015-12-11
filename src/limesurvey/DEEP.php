@@ -21,10 +21,10 @@ class DEEP extends PluginBase
     public function beforeSurveyPage()
     {
         $oEvent = $this->getEvent();
-        
+
         // Inject JS and CSS
         // TODO: Defer injection until after we know a survey requires DEEP
-        
+
         $coreURL = Yii::app()->assetManager->publish(dirname(__FILE__) . '/assets/DEEPCore.js');
         App()->getClientScript()->registerScriptFile($coreURL);
 
@@ -49,8 +49,14 @@ class DEEP extends PluginBase
 </div>
 <script type="text/javascript">
 jQuery(function() {
-    var DEEP = new DEEPLimeSurvey('{$oEvent->get('code')}');
-    DEEP.setup();
+    if (window.DEEPLoaded) {
+        alert("Error: DEEP cannot be loaded twice on this page.");
+    } else {
+        window.DEEPLoaded = true;
+        
+        var DEEP = new DEEPLimeSurvey('{$oEvent->get('code')}');
+        DEEP.setup();
+    }
 });
 </script>
 EOD;
