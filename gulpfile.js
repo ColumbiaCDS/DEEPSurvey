@@ -1,12 +1,12 @@
 var gulp    = require('gulp'),
     include = require('gulp-include'),
     rename  = require('gulp-rename'),
-    zip     = require('gulp-zip');
+    shell   = require('gulp-shell');
 
 // Qualtrics compilation
 gulp.task('qualtrics', function() {
   // Compile DEEPforQualtrics.js
-  
+
   gulp.src("src/qualtrics/DEEPforQualtrics.js")
     .pipe(include())
       .on('error', console.log)
@@ -15,7 +15,7 @@ gulp.task('qualtrics', function() {
 
 // LimeSurvey compilation
 gulp.task('limesurvey', function() {
-  
+
   // Move the LimeSurvey plugin framework folder
   gulp.src('src/limesurvey/**/*')
     .pipe(gulp.dest('dist/limesurvey/DEEP'));
@@ -31,9 +31,10 @@ gulp.task('limesurvey', function() {
     .pipe(gulp.dest('dist/limesurvey/DEEP/assets'));
 
   // Zip up the DEEP folder to DEEP.zip
-  return gulp.src('dist/limesurvey/DEEP/**/*')
-        .pipe(zip('DEEP.zip'))
-        .pipe(gulp.dest('dist/limesurvey'));
+  return gulp.src('dist/limesurvey/')
+        .pipe(shell([
+          'cd dist/limesurvey; rm DEEP.zip; zip -r DEEP.zip DEEP'
+        ]));
 });
 
 gulp.task('default', ['qualtrics', 'limesurvey']);
