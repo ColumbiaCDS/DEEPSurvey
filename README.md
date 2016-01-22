@@ -4,10 +4,14 @@ Integrated DEEP is a system that implements DEEP for Qualtrics and LimeSurvey.
 
 ## What do I need to install DEEP?
 
-- If you're using Qualtrics, paste `/dist/qualtrics/DEEPforQualtrics.js`
-  into a text box field.
+For more detailed instructions, consult the main page for DEEP:
+https://sites.google.com/a/decisionsciences.columbia.edu/cds-wiki/deep-software
+
+- If you're using Qualtrics, add a new text box. Paste the contents of
+  `/dist/qualtrics/DEEPforQualtrics.js` into the JavaScript field.
 - If you're using LimeSurvey, install the DEEP plugin at
-  `/dist/limesurvey/DEEP.zip`.
+  `/dist/limesurvey/DEEP.zip` and activate it in the admin panel.
+  Then, create a new "long free text" question field and add a name.
 - Set the DEEP ID, which is `"DEEP" + "TIME/RISK" + question count`, e.g.
   `DEEPTIME12` or `DEEPRISK8`.
     - In Qualtrics, insert this DEEP ID into the Question Title.
@@ -63,7 +67,7 @@ compilation. Instead, it just combines files together.
 DEEPQualtrics, outputting one file that the user can put into Qualtrics.
 - It combines the LimeSurvey plugin framework with DEEPCore, DEEPTutorial,
 and DEEPLimeSurvey in one folder, zips up the folder, and outputs the zip
-file ready for installation into the LimeSurvey admin panel.
+file ready for installation into LimeSurvey.
 
 ### Requirements
 
@@ -84,50 +88,9 @@ For more information, consult `gulpfile.js`.
 1. Make sure you have JSDoc installed. If not: `npm install --global jsdoc`
 2. `jsdoc src/DEEP*.js -a all -d ./doc`
 
-## Development Log
-
-### October 9, 2015
-
-- Started framework for Qualtrics DEEP
-- Built out UI for Qualtrics
-- Built out IDEEPTime and IDEEPQualtrics core functions
-- Added priors
-- Added randomization
-- Added most of the logic
-- Initial testing against current Qualtrics
-
-### October 10, 2015
-
-- Refactored DEEPTime to DEEPCore; both DEEP Time and DEEP Risk
-  will use DEEPCore
-- Added selective code switches for DEEP Time and DEEP Risk
-- Implemented DEEP Risk
-- Documented DEEPCore
-- Fixed ID bugs
-- Refactored first run
-
-### October 11, 2015
-
-- Minor refactor of getChoiceOption to make it more compact
-- Refactored DEEPCore.nextQuestion and .beginDEEP() and
-  renderChoices(), and parts of DEEPQualtrics, to decouple
-  the tight connection between DEEPCore and DEEPQualtrics
-  by not making DEEPCore call anything on the platform object.
-- Added validation/error handling
-- Added introduction and warm-up
-- Added mode to skip the tutorial
-- Updated documentation for DEEPQualtrics
-- Added documentation for DEEPTutorial
-- Refactored skipTutorial and added debugMode
-- Implemented DEEP on LimeSurvey
-- Added compilation system
-- Added README
-
 ## TODO
 
 ### Consider
 
 - Consider using lz-string to compress itemRisks and codedIndexers or consider lazy-loading them dynamically
-- Adding a check for jQuery - may fail without
-- Adding a "saving" message in Qualtrics
 - Adding !important or clearing all CSS; consider http://yuilibrary.com/yui/docs/cssreset
